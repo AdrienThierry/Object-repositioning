@@ -11,7 +11,7 @@
 using namespace cv;
 using namespace std;
 
-typedef struct SuperpixelArray SuperpixelArray;
+typedef struct Superpixel Superpixel;
 
 int main( int argc, char** argv )
 {
@@ -44,13 +44,12 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Mean shift filtering
 	//--------------------------------------------------------------------------------
-	//pyrMeanShiftFiltering(img, outImg, 50, 50, 3);
-	outImg = img;
+	pyrMeanShiftFiltering(img, outImg, 50, 50, 3);
 
 	//--------------------------------------------------------------------------------
 	// Superpixels generation
 	//--------------------------------------------------------------------------------
-	SuperpixelArray superpixels = computeSuperpixels(outImg);
+	vector<Superpixel> *superpixels = computeSuperpixels(outImg);
 
 	//--------------------------------------------------------------------------------
 	// TEST : print superpixels
@@ -77,6 +76,8 @@ int main( int argc, char** argv )
 	SDL_DestroyRenderer(ren);
 	SDL_DestroyWindow(win);
 	SDL_Quit();
+
+	free(superpixels);
 
 	return 0;
 }
