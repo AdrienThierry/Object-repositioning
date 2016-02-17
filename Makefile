@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named test_opencv
+# Target rules for targets named object_repositioning
 
 # Build rule for target.
-test_opencv: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 test_opencv
-.PHONY : test_opencv
+object_repositioning: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 object_repositioning
+.PHONY : object_repositioning
 
 # fast build rule for target.
-test_opencv/fast:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/build
-.PHONY : test_opencv/fast
+object_repositioning/fast:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/build
+.PHONY : object_repositioning/fast
 
 src/Superpixel.o: src/Superpixel.cpp.o
 
@@ -129,7 +129,7 @@ src/Superpixel.o: src/Superpixel.cpp.o
 
 # target to build an object file
 src/Superpixel.cpp.o:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/Superpixel.cpp.o
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o
 .PHONY : src/Superpixel.cpp.o
 
 src/Superpixel.i: src/Superpixel.cpp.i
@@ -138,7 +138,7 @@ src/Superpixel.i: src/Superpixel.cpp.i
 
 # target to preprocess a source file
 src/Superpixel.cpp.i:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/Superpixel.cpp.i
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.i
 .PHONY : src/Superpixel.cpp.i
 
 src/Superpixel.s: src/Superpixel.cpp.s
@@ -147,7 +147,7 @@ src/Superpixel.s: src/Superpixel.cpp.s
 
 # target to generate assembly for a file
 src/Superpixel.cpp.s:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/Superpixel.cpp.s
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.s
 .PHONY : src/Superpixel.cpp.s
 
 src/main.o: src/main.cpp.o
@@ -156,7 +156,7 @@ src/main.o: src/main.cpp.o
 
 # target to build an object file
 src/main.cpp.o:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/main.cpp.o
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/main.cpp.o
 .PHONY : src/main.cpp.o
 
 src/main.i: src/main.cpp.i
@@ -165,7 +165,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/main.cpp.i
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -174,7 +174,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/main.cpp.s
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 src/opencv_2_sdl.o: src/opencv_2_sdl.cpp.o
@@ -183,7 +183,7 @@ src/opencv_2_sdl.o: src/opencv_2_sdl.cpp.o
 
 # target to build an object file
 src/opencv_2_sdl.cpp.o:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/opencv_2_sdl.cpp.o
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/opencv_2_sdl.cpp.o
 .PHONY : src/opencv_2_sdl.cpp.o
 
 src/opencv_2_sdl.i: src/opencv_2_sdl.cpp.i
@@ -192,7 +192,7 @@ src/opencv_2_sdl.i: src/opencv_2_sdl.cpp.i
 
 # target to preprocess a source file
 src/opencv_2_sdl.cpp.i:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/opencv_2_sdl.cpp.i
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/opencv_2_sdl.cpp.i
 .PHONY : src/opencv_2_sdl.cpp.i
 
 src/opencv_2_sdl.s: src/opencv_2_sdl.cpp.s
@@ -201,7 +201,7 @@ src/opencv_2_sdl.s: src/opencv_2_sdl.cpp.s
 
 # target to generate assembly for a file
 src/opencv_2_sdl.cpp.s:
-	$(MAKE) -f CMakeFiles/test_opencv.dir/build.make CMakeFiles/test_opencv.dir/src/opencv_2_sdl.cpp.s
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/opencv_2_sdl.cpp.s
 .PHONY : src/opencv_2_sdl.cpp.s
 
 # Help Target
@@ -212,7 +212,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... test_opencv"
+	@echo "... object_repositioning"
 	@echo "... src/Superpixel.o"
 	@echo "... src/Superpixel.i"
 	@echo "... src/Superpixel.s"

@@ -114,7 +114,7 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=test_opencv
+CMAKE_PROJECT_NAME:STATIC=object_repositioning
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -184,6 +184,12 @@ OpenCV_LIB_DIR_OPT:PATH=
 
 //pkg-config executable
 PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
+
+//Value Computed by CMake
+object_repositioning_BINARY_DIR:STATIC=/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning
+
+//Value Computed by CMake
+object_repositioning_SOURCE_DIR:STATIC=/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning
 
 //Value Computed by CMake
 test_opencv_BINARY_DIR:STATIC=/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning
