@@ -1,0 +1,58 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Color.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Point.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Superpixel.cpp
+stdio.h
+-
+Superpixel.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Superpixel.hpp
+Point.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Point.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Superpixel.hpp
+opencv2/opencv.hpp
+-
+Point.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Point.hpp
+Color.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Color.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/main.cpp
+stdio.h
+-
+string.h
+-
+opencv2/opencv.hpp
+-
+opencv2/imgproc/imgproc.hpp
+-
+opencv2/ml/ml.hpp
+-
+SDL2/SDL.h
+-
+opencv_2_sdl.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/opencv_2_sdl.hpp
+Superpixel.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Superpixel.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/opencv_2_sdl.cpp
+opencv_2_sdl.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/opencv_2_sdl.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/opencv_2_sdl.hpp
+stdio.h
+-
+SDL2/SDL.h
+-
+opencv2/opencv.hpp
+-
+
