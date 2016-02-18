@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <SDL2/SDL.h>
 #include "Point.hpp"
 #include "Color.hpp"
 
@@ -19,4 +20,6 @@ std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img);
 // the numbers of rows and cols in the original image
 cv::Mat convertSuperpixelsToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
 
+// Show centroids of superpixels with an SDL_Renderer
+void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels);
 #endif

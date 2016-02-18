@@ -4,6 +4,9 @@
 #include "Superpixel.hpp"
 #include "Point.hpp"
 
+#define CENTROID_RECT_SIZE 5 // Size of centroid when shown on screen
+#define CENTROID_RECT_ALPHA 255 // Transparency of centroid when shown on screen
+
 #define dbg_print1(buffer, string, arg) write(1, buffer, sprintf(buffer, string, arg))
 
 std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img) {
@@ -17,7 +20,6 @@ std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img) {
 		superpixelByColor.at(i) = NULL;
 	}
 
-	// TODO : implement real function
 	for (int i = 0 ; i < img.rows ; i++) {
 		for (int j = 0 ; j < img.cols ; j++) {
 			// Get current pixel color
@@ -34,10 +36,8 @@ std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img) {
 				newSuperpixel->color.g = g;
 				newSuperpixel->color.b = b;
 				superpixelByColor.at(colorIndex) = newSuperpixel;
-			}
+			}			
 
-			// TODO : find center of superpixel
-			
 			struct Point pixel;
 
 			pixel.x = j;
@@ -52,6 +52,18 @@ std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img) {
 		if (superpixelByColor.at(i) != NULL) {
 			result->push_back(*superpixelByColor.at(i));
 		}
+	}
+
+	// Compute the centroid of each superpixel
+	for (unsigned int i = 0 ; i < result->size() ; i++) {
+		result->at(i).center.x = 0;
+		result->at(i).center.y = 0;
+		for (unsigned int j = 0 ; j < result->at(i).pixels.size() ; j++) {
+			result->at(i).center.x += result->at(i).pixels.at(j).x;
+			result->at(i).center.y += result->at(i).pixels.at(j).y;
+		}
+		result->at(i).center.x /= result->at(i).pixels.size();
+		result->at(i).center.y /= result->at(i).pixels.size();
 	}
 
 	return result;
@@ -74,4 +86,19 @@ cv::Mat convertSuperpixelsToCV_Mat(std::vector<struct Superpixel>* superpixels, 
 	return result;
 }	
 
+void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels) {
+	SDL_Rect r;
+    r.w = CENTROID_RECT_SIZE;
+    r.h = CENTROID_RECT_SIZE;
+
+	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
+		SDL_SetRenderDrawColor( ren, superpixels->at(i).color.r / 2, superpixels->at(i).color.g / 2, superpixels->at(i).color.b / 2, CENTROID_RECT_ALPHA );
+
+		r.x = superpixels->at(i).center.x;
+		r.y = superpixels->at(i).center.y;
+
+		// Render rect
+		SDL_RenderFillRect( ren, &r );
+	}
+}
 

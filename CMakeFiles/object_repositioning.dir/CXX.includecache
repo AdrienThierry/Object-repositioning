@@ -27,6 +27,8 @@ opencv2/opencv.hpp
 -
 vector
 -
+SDL2/SDL.h
+-
 Point.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Point.hpp
 Color.hpp

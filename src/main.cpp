@@ -52,7 +52,7 @@ int main( int argc, char** argv )
 	vector<Superpixel> *superpixels = computeSuperpixels(outImg);
 
 	//--------------------------------------------------------------------------------
-	// TEST : print superpixels
+	// TEST : show superpixels
 	//--------------------------------------------------------------------------------	
 	Mat superpixelsMat = convertSuperpixelsToCV_Mat(superpixels, img.rows, img.cols);
 
@@ -69,7 +69,11 @@ int main( int argc, char** argv )
 		}
 		//Render the scene
 		SDL_RenderClear(ren);
+
 		SDL_RenderCopy(ren, tex, NULL, NULL);
+
+		showCentroids(ren, superpixels);
+
 		SDL_RenderPresent(ren);
 	}
 
