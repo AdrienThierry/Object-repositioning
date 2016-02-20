@@ -6,6 +6,7 @@ CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o: src/Point.hpp
 CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o: src/Superpixel.cpp
 CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o: src/Superpixel.hpp
 
+CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/BoundingBox.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Color.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Point.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Superpixel.hpp
