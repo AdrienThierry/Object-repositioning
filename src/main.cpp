@@ -9,6 +9,7 @@
 #include "Superpixel.hpp"
 #include "Point.hpp"
 #include "BoundingBox.hpp"
+#include "MeanShift.h"
 
 using namespace std;
 
@@ -18,8 +19,16 @@ typedef struct BoundingBox BoundingBox;
 
 int main( int argc, char** argv )
 {
-	cv::Mat img = cv::imread("data/outside.jpg");
-	cv::Mat outImg;
+	//--------------------------------------------------------------------------------
+	// Image loading
+	//--------------------------------------------------------------------------------
+	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
+
+	// IplImage generation from img. Ipgimage is used as input for Meanshift
+	IplImage* img2;
+	img2 = cvCreateImage(cvSize(img.cols,img.rows),8,3);
+	IplImage ipltemp=img;
+	cvCopy(&ipltemp,img2);
 
 	bool boundingBoxDrawn = false;
 
@@ -31,7 +40,7 @@ int main( int argc, char** argv )
 		return 1;
 	}
 
-	SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, img.cols, img.rows, SDL_WINDOW_SHOWN);
+	SDL_Window *win = SDL_CreateWindow("Object repositioning", 100, 100, img.cols, img.rows, SDL_WINDOW_SHOWN);
 	if (win == NULL) {
 		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
@@ -49,13 +58,18 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Mean shift filtering
 	//--------------------------------------------------------------------------------
-	pyrMeanShiftFiltering(img, outImg, 50, 50, 3);
+	int **ilabels = new int *[img2->height];
+	for(int i=0;i<img2->height;i++)
+		ilabels[i] = new int [img2->width];
+	int regionCount = MeanShift(img2, ilabels);
+
+	//pyrMeanShiftFiltering(img, outImg, 70, 70, 3);
 	//outImg = img;
 
 	//--------------------------------------------------------------------------------
 	// Superpixels generation
 	//--------------------------------------------------------------------------------
-	vector<Superpixel> *superpixels = computeSuperpixels(outImg);
+	vector<Superpixel> *superpixels = computeSuperpixels(ilabels, img.rows, img.cols);
 
 	//--------------------------------------------------------------------------------
 	// TEST : show superpixels
@@ -131,6 +145,8 @@ int main( int argc, char** argv )
 		for (int i = 0 ; i < 4 ; i++) {
 			SDL_RenderDrawLine(ren,boundingBox.points[i].x, boundingBox.points[i].y, boundingBox.points[(i+1)%4].x, boundingBox.points[(i+1)%4].y);
 		}
+
+		showCentroids(ren, superpixels);
 
 		SDL_RenderPresent(ren);
 

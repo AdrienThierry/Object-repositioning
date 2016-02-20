@@ -16,8 +16,8 @@ struct Superpixel {
 	IntersectionWithBB intersection;
 };
 
-// Take as input an OpenCV matrix and returns a array of superpixels that compose the matrix
-std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img);
+// Take as input a label matrix and returns a array of superpixels that compose the matrix
+std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, int rows, int cols);
 
 // Convert superpixels to an OpenCV matrix to be shown for debug purposes. Also takes as inputs
 // the numbers of rows and cols in the original image

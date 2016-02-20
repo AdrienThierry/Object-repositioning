@@ -150,6 +150,33 @@ src/BoundingBox.cpp.s:
 	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.s
 .PHONY : src/BoundingBox.cpp.s
 
+src/MeanShift.o: src/MeanShift.cpp.o
+
+.PHONY : src/MeanShift.o
+
+# target to build an object file
+src/MeanShift.cpp.o:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o
+.PHONY : src/MeanShift.cpp.o
+
+src/MeanShift.i: src/MeanShift.cpp.i
+
+.PHONY : src/MeanShift.i
+
+# target to preprocess a source file
+src/MeanShift.cpp.i:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.i
+.PHONY : src/MeanShift.cpp.i
+
+src/MeanShift.s: src/MeanShift.cpp.s
+
+.PHONY : src/MeanShift.s
+
+# target to generate assembly for a file
+src/MeanShift.cpp.s:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.s
+.PHONY : src/MeanShift.cpp.s
+
 src/Superpixel.o: src/Superpixel.cpp.o
 
 .PHONY : src/Superpixel.o
@@ -243,6 +270,9 @@ help:
 	@echo "... src/BoundingBox.o"
 	@echo "... src/BoundingBox.i"
 	@echo "... src/BoundingBox.s"
+	@echo "... src/MeanShift.o"
+	@echo "... src/MeanShift.i"
+	@echo "... src/MeanShift.s"
 	@echo "... src/Superpixel.o"
 	@echo "... src/Superpixel.i"
 	@echo "... src/Superpixel.s"

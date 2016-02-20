@@ -9,33 +9,29 @@
 
 #define dbg_print1(buffer, string, arg) write(1, buffer, sprintf(buffer, string, arg))
 
-std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img) {
+std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, int rows, int cols) {
 	std::vector<struct Superpixel>* result = new std::vector<struct Superpixel>;
 
-	// Look-up table to quickly find a superpixel by its color. The index in this array is the color.
+	// Look-up table to quickly find a superpixel by its label. The index in this array is the label.
 	// The corresponding element is a pointer to the corresponding superpixel.
-	std::vector<struct Superpixel*> superpixelByColor(256*256*256);
+	std::vector<struct Superpixel*> superpixelByLabel(rows*cols);
 
-	for (unsigned int i = 0 ; i < superpixelByColor.size() ; i++) {
-		superpixelByColor.at(i) = NULL;
+	for (unsigned int i = 0 ; i < superpixelByLabel.size() ; i++) {
+		superpixelByLabel.at(i) = NULL;
 	}
 
-	for (int i = 0 ; i < img.rows ; i++) {
-		for (int j = 0 ; j < img.cols ; j++) {
-			// Get current pixel color
-			int r, g, b;
-			r = img.data[img.step[0]*i + img.step[1]*j + 2];
-			g = img.data[img.step[0]*i + img.step[1]*j + 1];
-			b = img.data[img.step[0]*i + img.step[1]*j + 0];
-			int colorIndex = (r << 16) + (g << 8) + b;
+	for (int i = 0 ; i < rows ; i++) {
+		for (int j = 0 ; j < cols ; j++) {
+			// Get current pixel label
+			int label = ilabels[i][j];
 
-			// If no superpixel exists for given color, create a new one
-			if (superpixelByColor.at(colorIndex) == NULL) {
+			// If no superpixel exists for given label, create a new one
+			if (superpixelByLabel.at(label) == NULL) {
 				Superpixel *newSuperpixel = new Superpixel;
-				newSuperpixel->color.r = r;
-				newSuperpixel->color.g = g;
-				newSuperpixel->color.b = b;
-				superpixelByColor.at(colorIndex) = newSuperpixel;
+				newSuperpixel->color.r = label;
+				newSuperpixel->color.g = label;
+				newSuperpixel->color.b = label;
+				superpixelByLabel.at(label) = newSuperpixel;
 			}			
 
 			struct Point pixel;
@@ -43,14 +39,14 @@ std::vector<struct Superpixel>* computeSuperpixels(cv::Mat img) {
 			pixel.x = j;
 			pixel.y = i;
 
-			superpixelByColor.at(colorIndex)->pixels.push_back(pixel);
+			superpixelByLabel.at(label)->pixels.push_back(pixel);
 		}
 	}
 
-	// Create Superpixel vector from superpixelByColor
-	for (unsigned int i = 0 ; i < superpixelByColor.size() ; i++) {
-		if (superpixelByColor.at(i) != NULL) {
-			result->push_back(*superpixelByColor.at(i));
+	// Create Superpixel vector from superpixelByLabel
+	for (unsigned int i = 0 ; i < superpixelByLabel.size() ; i++) {
+		if (superpixelByLabel.at(i) != NULL) {
+			result->push_back(*superpixelByLabel.at(i));
 		}
 	}
 
