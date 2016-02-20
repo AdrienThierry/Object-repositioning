@@ -86,6 +86,33 @@ cv::Mat convertSuperpixelsToCV_Mat(std::vector<struct Superpixel>* superpixels, 
 	return result;
 }	
 
+cv::Mat convertSuperpixelsIntersectionToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols) {
+	cv::Mat result = cv::Mat::zeros(rows, cols, CV_8UC3);
+
+	int color; // How much white (between 0 and 255)
+
+	// Create OpenCV matrix
+	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
+		if (superpixels->at(i).intersection == OUTSIDE)
+			color = 255;
+		else if (superpixels->at(i).intersection == INSIDE)
+			color = 90;
+		else
+			color = 0;
+
+
+		for (unsigned int j = 0 ; j < superpixels->at(i).pixels.size() ; j++) {
+			int row = superpixels->at(i).pixels.at(j).y;
+			int col = superpixels->at(i).pixels.at(j).x;
+			result.data[result.step[0]*row + result.step[1]*col + 0] = color;
+			result.data[result.step[0]*row + result.step[1]*col + 1] = color;
+			result.data[result.step[0]*row + result.step[1]*col + 2] = color;
+		}
+	}
+	
+	return result;
+}
+
 void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels) {
 	SDL_Rect r;
     r.w = CENTROID_RECT_SIZE;

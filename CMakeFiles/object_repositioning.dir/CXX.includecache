@@ -6,9 +6,19 @@
 
 #IncludeRegexTransform: 
 
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.cpp
+stdio.h
+-
+BoundingBox.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.hpp
+vector
+-
 Point.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Point.hpp
+Superpixel.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Superpixel.hpp
 
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Color.hpp
 

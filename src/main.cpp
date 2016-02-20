@@ -21,6 +21,8 @@ int main( int argc, char** argv )
 	cv::Mat img = cv::imread("data/outside.jpg");
 	cv::Mat outImg;
 
+	bool boundingBoxDrawn = false;
+
 	//--------------------------------------------------------------------------------
 	// SDL Initialisation
 	//--------------------------------------------------------------------------------
@@ -47,8 +49,8 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Mean shift filtering
 	//--------------------------------------------------------------------------------
-	//pyrMeanShiftFiltering(img, outImg, 50, 50, 3);
-	outImg = img;
+	pyrMeanShiftFiltering(img, outImg, 50, 50, 3);
+	//outImg = img;
 
 	//--------------------------------------------------------------------------------
 	// Superpixels generation
@@ -59,6 +61,7 @@ int main( int argc, char** argv )
 	// TEST : show superpixels
 	//--------------------------------------------------------------------------------	
 	cv::Mat superpixelsMat = convertSuperpixelsToCV_Mat(superpixels, img.rows, img.cols);
+	cv::Mat superpixelsIntersectionMat;
 
 	SDL_Surface *surf = convertCV_MatToSDL_Surface(superpixelsMat);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
@@ -69,6 +72,10 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------	
 	SDL_Event e;
 	BoundingBox boundingBox;
+	for (int i = 0 ; i < 4 ; i++) {
+		boundingBox.points[i].x = 0;
+		boundingBox.points[i].y = 0;
+	}
 	bool quit = false;
 	bool clicking = false;
 	struct Point clickCoord, mousePosition;
@@ -86,10 +93,16 @@ int main( int argc, char** argv )
 					boundingBox.points[i].x = 0;
 					boundingBox.points[i].y = 0;
 				}
+
+				surf = convertCV_MatToSDL_Surface(superpixelsMat);
+				tex = SDL_CreateTextureFromSurface(ren, surf);
+
 			}
 			
 			if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
 				clicking = false;
+
+				boundingBoxDrawn = true;
 			}
 
 			if (clicking == true && e.type == SDL_MOUSEMOTION) {
@@ -106,6 +119,7 @@ int main( int argc, char** argv )
 				boundingBox.points[3].y = mousePosition.y;
 			}
 		}
+
 		//Render the scene
 		SDL_RenderClear(ren);
 
@@ -119,6 +133,16 @@ int main( int argc, char** argv )
 		}
 
 		SDL_RenderPresent(ren);
+
+		if (boundingBoxDrawn) {
+			computeSuperpixelIntersectionWithBB(superpixels, boundingBox);
+			superpixelsIntersectionMat = convertSuperpixelsIntersectionToCV_Mat(superpixels, img.rows, img.cols);
+
+			surf = convertCV_MatToSDL_Surface(superpixelsIntersectionMat);
+			tex = SDL_CreateTextureFromSurface(ren, surf);
+
+			boundingBoxDrawn = false;
+		}
 	}
 
 	SDL_DestroyRenderer(ren);

@@ -123,6 +123,33 @@ object_repositioning/fast:
 	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/build
 .PHONY : object_repositioning/fast
 
+src/BoundingBox.o: src/BoundingBox.cpp.o
+
+.PHONY : src/BoundingBox.o
+
+# target to build an object file
+src/BoundingBox.cpp.o:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o
+.PHONY : src/BoundingBox.cpp.o
+
+src/BoundingBox.i: src/BoundingBox.cpp.i
+
+.PHONY : src/BoundingBox.i
+
+# target to preprocess a source file
+src/BoundingBox.cpp.i:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.i
+.PHONY : src/BoundingBox.cpp.i
+
+src/BoundingBox.s: src/BoundingBox.cpp.s
+
+.PHONY : src/BoundingBox.s
+
+# target to generate assembly for a file
+src/BoundingBox.cpp.s:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.s
+.PHONY : src/BoundingBox.cpp.s
+
 src/Superpixel.o: src/Superpixel.cpp.o
 
 .PHONY : src/Superpixel.o
@@ -213,6 +240,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... object_repositioning"
+	@echo "... src/BoundingBox.o"
+	@echo "... src/BoundingBox.i"
+	@echo "... src/BoundingBox.s"
 	@echo "... src/Superpixel.o"
 	@echo "... src/Superpixel.i"
 	@echo "... src/Superpixel.s"
