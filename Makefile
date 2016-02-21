@@ -150,6 +150,33 @@ src/BoundingBox.cpp.s:
 	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.s
 .PHONY : src/BoundingBox.cpp.s
 
+src/Color.o: src/Color.cpp.o
+
+.PHONY : src/Color.o
+
+# target to build an object file
+src/Color.cpp.o:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Color.cpp.o
+.PHONY : src/Color.cpp.o
+
+src/Color.i: src/Color.cpp.i
+
+.PHONY : src/Color.i
+
+# target to preprocess a source file
+src/Color.cpp.i:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Color.cpp.i
+.PHONY : src/Color.cpp.i
+
+src/Color.s: src/Color.cpp.s
+
+.PHONY : src/Color.s
+
+# target to generate assembly for a file
+src/Color.cpp.s:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Color.cpp.s
+.PHONY : src/Color.cpp.s
+
 src/MeanShift.o: src/MeanShift.cpp.o
 
 .PHONY : src/MeanShift.o
@@ -270,6 +297,9 @@ help:
 	@echo "... src/BoundingBox.o"
 	@echo "... src/BoundingBox.i"
 	@echo "... src/BoundingBox.s"
+	@echo "... src/Color.o"
+	@echo "... src/Color.i"
+	@echo "... src/Color.s"
 	@echo "... src/MeanShift.o"
 	@echo "... src/MeanShift.i"
 	@echo "... src/MeanShift.s"

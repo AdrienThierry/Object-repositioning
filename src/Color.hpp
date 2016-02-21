@@ -7,4 +7,12 @@ struct Color {
 	int b;
 };
 
+struct ColorLab {
+	int L;
+	int a;
+	int b;
+};
+
+struct ColorLab convertRGB2Lab(struct Color color);
+
 #endif

@@ -14,6 +14,7 @@ struct Superpixel {
 	std::vector<struct Point> pixels; // Pixels that belong to the superpixel
 	struct Color color;
 	IntersectionWithBB intersection;
+	float saliency;
 };
 
 // Take as input a label matrix and returns a array of superpixels that compose the matrix
@@ -30,6 +31,13 @@ cv::Mat convertSuperpixelsToCV_Mat(std::vector<struct Superpixel>* superpixels, 
 // Superpixels that cross BB : BLACK
 cv::Mat convertSuperpixelsIntersectionToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
 
+
+// Convert superpixels saliency to an OpenCV matrix to be shown for debug purposes
+cv::Mat convertSaliencyToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
+
 // Show centroids of superpixels with an SDL_Renderer
 void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels);
+
+// Convert superpixel color in lab
+
 #endif

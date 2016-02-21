@@ -4,6 +4,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o"
   "CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o"
   "CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o"
+  "CMakeFiles/object_repositioning.dir/src/Color.cpp.o"
   "object_repositioning.pdb"
   "object_repositioning"
 )

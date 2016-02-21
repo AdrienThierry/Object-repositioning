@@ -22,7 +22,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
+	cv::Mat img = cv::imread("data/paques_island.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift
 	IplImage* img2;
@@ -76,6 +76,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------	
 	cv::Mat superpixelsMat = convertSuperpixelsToCV_Mat(superpixels, img.rows, img.cols);
 	cv::Mat superpixelsIntersectionMat;
+	cv::Mat saliencyMat;
 
 	SDL_Surface *surf = convertCV_MatToSDL_Surface(superpixelsMat);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
@@ -148,15 +149,16 @@ int main( int argc, char** argv )
 			SDL_RenderDrawLine(ren,boundingBox.points[i].x, boundingBox.points[i].y, boundingBox.points[(i+1)%4].x, boundingBox.points[(i+1)%4].y);
 		}
 
-		showCentroids(ren, superpixels);
+		//showCentroids(ren, superpixels);
 
 		SDL_RenderPresent(ren);
 
 		if (boundingBoxDrawn) {
 			computeSuperpixelIntersectionWithBB(superpixels, boundingBox);
 			superpixelsIntersectionMat = convertSuperpixelsIntersectionToCV_Mat(superpixels, img.rows, img.cols);
-
-			surf = convertCV_MatToSDL_Surface(superpixelsIntersectionMat);
+			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
+			saliencyMat = convertSaliencyToCV_Mat(superpixels, img.rows, img.cols);
+			surf = convertCV_MatToSDL_Surface(saliencyMat);
 			tex = SDL_CreateTextureFromSurface(ren, surf);
 
 			boundingBoxDrawn = false;

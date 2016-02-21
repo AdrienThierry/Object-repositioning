@@ -7,6 +7,9 @@ CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o: src/Color.hpp
 CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o: src/Point.hpp
 CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o: src/Superpixel.hpp
 
+CMakeFiles/object_repositioning.dir/src/Color.cpp.o: src/Color.cpp
+CMakeFiles/object_repositioning.dir/src/Color.cpp.o: src/Color.hpp
+
 CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o: src/MeanShift.cpp
 CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o: src/MeanShift.h
 
