@@ -9,7 +9,7 @@
 
 #define dbg_print1(buffer, string, arg) write(1, buffer, sprintf(buffer, string, arg))
 
-std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, int rows, int cols) {
+std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, cv::Mat img, int rows, int cols) {
 	std::vector<struct Superpixel>* result = new std::vector<struct Superpixel>;
 
 	// Look-up table to quickly find a superpixel by its label. The index in this array is the label.
@@ -28,9 +28,9 @@ std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, int rows, int 
 			// If no superpixel exists for given label, create a new one
 			if (superpixelByLabel.at(label) == NULL) {
 				Superpixel *newSuperpixel = new Superpixel;
-				newSuperpixel->color.r = label;
-				newSuperpixel->color.g = label;
-				newSuperpixel->color.b = label;
+				newSuperpixel->color.r = 0;
+				newSuperpixel->color.g = 0;
+				newSuperpixel->color.b = 0;
 				superpixelByLabel.at(label) = newSuperpixel;
 			}			
 
@@ -50,16 +50,25 @@ std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, int rows, int 
 		}
 	}
 
-	// Compute the centroid of each superpixel
+	// Compute the centroid and the mean color of each superpixel
 	for (unsigned int i = 0 ; i < result->size() ; i++) {
 		result->at(i).center.x = 0;
 		result->at(i).center.y = 0;
+		result->at(i).color.r = 0;
+		result->at(i).color.g = 0;
+		result->at(i).color.b = 0;
 		for (unsigned int j = 0 ; j < result->at(i).pixels.size() ; j++) {
 			result->at(i).center.x += result->at(i).pixels.at(j).x;
 			result->at(i).center.y += result->at(i).pixels.at(j).y;
+			result->at(i).color.r += img.data[img.step[0]*(result->at(i).pixels.at(j).y) + img.step[1]*(result->at(i).pixels.at(j).x) + 2];
+			result->at(i).color.g += img.data[img.step[0]*(result->at(i).pixels.at(j).y) + img.step[1]*(result->at(i).pixels.at(j).x) + 1];
+			result->at(i).color.b += img.data[img.step[0]*(result->at(i).pixels.at(j).y) + img.step[1]*(result->at(i).pixels.at(j).x) + 0];
 		}
 		result->at(i).center.x /= result->at(i).pixels.size();
 		result->at(i).center.y /= result->at(i).pixels.size();
+		result->at(i).color.r /= result->at(i).pixels.size();
+		result->at(i).color.g /= result->at(i).pixels.size();
+		result->at(i).color.b /= result->at(i).pixels.size();
 	}
 
 	return result;

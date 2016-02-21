@@ -17,7 +17,7 @@ struct Superpixel {
 };
 
 // Take as input a label matrix and returns a array of superpixels that compose the matrix
-std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, int rows, int cols);
+std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, cv::Mat img, int rows, int cols);
 
 // Convert superpixels to an OpenCV matrix to be shown for debug purposes. Also takes as inputs
 // the numbers of rows and cols in the original image

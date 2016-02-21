@@ -61,7 +61,7 @@ int main( int argc, char** argv )
 	int **ilabels = new int *[img2->height];
 	for(int i=0;i<img2->height;i++)
 		ilabels[i] = new int [img2->width];
-	int regionCount = MeanShift(img2, ilabels);
+	MeanShift(img2, ilabels);
 
 	//pyrMeanShiftFiltering(img, outImg, 70, 70, 3);
 	//outImg = img;
@@ -69,7 +69,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Superpixels generation
 	//--------------------------------------------------------------------------------
-	vector<Superpixel> *superpixels = computeSuperpixels(ilabels, img.rows, img.cols);
+	vector<Superpixel> *superpixels = computeSuperpixels(ilabels, img, img.rows, img.cols);
 
 	//--------------------------------------------------------------------------------
 	// TEST : show superpixels
@@ -80,6 +80,8 @@ int main( int argc, char** argv )
 	SDL_Surface *surf = convertCV_MatToSDL_Surface(superpixelsMat);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
 
+	//cv::Mat image_out;
+	//cv::cvtColor(superpixelsMat, image_out, CV_BGR2Lab);
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
