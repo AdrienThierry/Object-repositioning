@@ -24,7 +24,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	cv::Mat img = cv::imread("data/paques_island.jpg"); // Input image
 
-	// IplImage generation from img. Ipgimage is used as input for Meanshift
+	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
 	img2 = cvCreateImage(cvSize(img.cols,img.rows),8,3);
 	IplImage ipltemp=img;
@@ -63,9 +63,6 @@ int main( int argc, char** argv )
 		ilabels[i] = new int [img2->width];
 	MeanShift(img2, ilabels);
 
-	//pyrMeanShiftFiltering(img, outImg, 70, 70, 3);
-	//outImg = img;
-
 	//--------------------------------------------------------------------------------
 	// Superpixels generation
 	//--------------------------------------------------------------------------------
@@ -80,9 +77,6 @@ int main( int argc, char** argv )
 
 	SDL_Surface *surf = convertCV_MatToSDL_Surface(superpixelsMat);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
-
-	//cv::Mat image_out;
-	//cv::cvtColor(superpixelsMat, image_out, CV_BGR2Lab);
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
@@ -102,6 +96,9 @@ int main( int argc, char** argv )
 				quit = true;
 			}
 
+			//--------------------------------------------------------------------------------
+			// Mouse button DOWN
+			//--------------------------------------------------------------------------------
 			if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
 				clicking = true;
 				clickCoord.x = e.motion.x;
@@ -116,12 +113,18 @@ int main( int argc, char** argv )
 
 			}
 			
+			//--------------------------------------------------------------------------------
+			// Mouse button UP
+			//--------------------------------------------------------------------------------
 			if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
 				clicking = false;
 
 				boundingBoxDrawn = true;
 			}
 
+			//--------------------------------------------------------------------------------
+			// Mouse MOVING
+			//--------------------------------------------------------------------------------
 			if (clicking == true && e.type == SDL_MOUSEMOTION) {
 				mousePosition.x = e.motion.x;
 				mousePosition.y = e.motion.y;
@@ -170,6 +173,8 @@ int main( int argc, char** argv )
 	SDL_Quit();
 
 	free(superpixels);
+	cvReleaseImage(&img2);
+	delete ilabels;
 
 	return 0;
 }

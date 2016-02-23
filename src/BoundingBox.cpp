@@ -56,7 +56,7 @@ void computeSuperpixelIntersectionWithBB(std::vector<struct Superpixel>* superpi
 
 }
 
-float distanceSuperpixelBB(struct Superpixel superpixel, BoundingBox bb, int rows, int cols) {
+float distanceSuperpixelBB(struct Superpixel *superpixel, BoundingBox bb, int rows, int cols) {
 	// Determine min x, max x, min y and max y in bounding box
 	float minX = (float)bb.points[0].x;
 	float maxX = (float)bb.points[0].x;
@@ -90,7 +90,7 @@ float distanceSuperpixelBB(struct Superpixel superpixel, BoundingBox bb, int row
 	return distance;
 }
 
-float distanceSuperpixels(struct Superpixel superpixel1, struct Superpixel superpixel2, int rows, int cols) {
+float distanceSuperpixels(struct Superpixel *superpixel1, struct Superpixel *superpixel2, int rows, int cols) {
 	float distance = 0;
 	float diffX = ((float)superpixel2.center.x - (float)superpixel1.center.x) / (float)cols;
 	float diffY = ((float)superpixel2.center.y - (float)superpixel1.center.y) / (float)rows;
@@ -102,9 +102,9 @@ float distanceSuperpixels(struct Superpixel superpixel1, struct Superpixel super
 
 float distanceLab(struct ColorLab color1, struct ColorLab color2) {
 	float distance = 0;
-	float diffL = ((float)color2.L - (float)color1.L) / 100.0;
-	float diffa = ((float)color2.a - (float)color1.a) / 300.0;
-	float diffb = ((float)color2.b - (float)color1.b) / 300.0;
+	float diffL = ((float)color2.L - (float)color1.L) / 255.0;
+	float diffa = ((float)color2.a - (float)color1.a) / 255.0;
+	float diffb = ((float)color2.b - (float)color1.b) / 255.0;
 
 	distance = sqrt((diffL * diffL) + (diffa * diffa) + (diffb * diffb));
 
