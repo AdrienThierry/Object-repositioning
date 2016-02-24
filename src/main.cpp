@@ -20,18 +20,22 @@ typedef struct BoundingBox BoundingBox;
 
 int main( int argc, char** argv )
 {
+	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, GMMLabelsBackground, GMMLabelsForeground};
+	WhatToShow currentlyShown = BaseImage;
+	bool drawCentroids = false;
+	bool showBoundingBox = true;
+	bool boundingBoxDrawn = false;
+
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/outside.jpg"); // Input image
+	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
 	img2 = cvCreateImage(cvSize(img.cols,img.rows),8,3);
 	IplImage ipltemp=img;
 	cvCopy(&ipltemp,img2);
-
-	bool boundingBoxDrawn = false;
 
 	//--------------------------------------------------------------------------------
 	// SDL Initialisation
@@ -70,16 +74,17 @@ int main( int argc, char** argv )
 	vector<Superpixel> *superpixels = computeSuperpixels(ilabels, img, img.rows, img.cols);
 
 	//--------------------------------------------------------------------------------
-	// TEST : show superpixels
+	// Matrix declarations
 	//--------------------------------------------------------------------------------	
-	cv::Mat superpixelsMat = convertSuperpixelsToCV_Mat(superpixels, img.rows, img.cols);
-	cv::Mat *probsBackground = computeProbsBackground(&superpixelsMat);
-	cv::Mat *probsBackgroundMat = convertProbsToCV_Mat(probsBackground);
-	cv::Mat superpixelsIntersectionMat;
-	cv::Mat saliencyMat;
+	cv::Mat *superpixelsMat = convertSuperpixelsToCV_Mat(superpixels, img.rows, img.cols);
+	cv::Mat *superpixelsIntersectionMat = NULL;
+	cv::Mat *saliencyMat = NULL;
+	cv::Mat *GMMLabelsBackgroundMat = NULL;
+	cv::Mat *GMMLabelsForegroundMat = NULL;
 
-	SDL_Surface *surf = convertCV_MatToSDL_Surface(*probsBackgroundMat);
-	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
+
+	SDL_Surface *surf;
+	SDL_Texture *tex;
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
@@ -100,6 +105,35 @@ int main( int argc, char** argv )
 			}
 
 			//--------------------------------------------------------------------------------
+			// Keyboard key DOWN
+			//--------------------------------------------------------------------------------
+			if (e.type == SDL_KEYDOWN) {
+				switch(e.key.keysym.sym) {
+					case SDLK_KP_1:
+						currentlyShown = BaseImage;
+						break;
+					case SDLK_KP_2:
+						currentlyShown = Superpixels;
+						break;
+					case SDLK_KP_3:
+						currentlyShown = SuperpixelsIntersection;
+						break;
+					case SDLK_KP_4:
+						currentlyShown = Saliency;
+						break;
+					case SDLK_KP_5:
+						currentlyShown = GMMLabelsBackground;
+						break;
+					case SDLK_KP_6:
+						currentlyShown = GMMLabelsForeground;
+						break;
+					default:
+						currentlyShown = BaseImage;
+						break;
+				}
+			}
+
+			//--------------------------------------------------------------------------------
 			// Mouse button DOWN
 			//--------------------------------------------------------------------------------
 			if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
@@ -110,10 +144,6 @@ int main( int argc, char** argv )
 					boundingBox.points[i].x = 0;
 					boundingBox.points[i].y = 0;
 				}
-
-				surf = convertCV_MatToSDL_Surface(superpixelsMat);
-				tex = SDL_CreateTextureFromSurface(ren, surf);
-
 			}
 			
 			//--------------------------------------------------------------------------------
@@ -143,19 +173,55 @@ int main( int argc, char** argv )
 			}
 		}
 
-		//Render the scene
+		// Clear renderer
 		SDL_RenderClear(ren);
+
+		// Load image to show in SDL_Surface and texture
+		switch(currentlyShown) {
+			case BaseImage:
+				surf = convertCV_MatToSDL_Surface(img);
+				break;
+			case Superpixels:
+				if (superpixelsMat != NULL)
+					surf = convertCV_MatToSDL_Surface(*superpixelsMat);
+				break;
+			case SuperpixelsIntersection:
+				if (superpixelsIntersectionMat != NULL)
+					surf = convertCV_MatToSDL_Surface(*superpixelsIntersectionMat);
+				break;
+			case Saliency:
+				if (saliencyMat != NULL)
+					surf = convertCV_MatToSDL_Surface(*saliencyMat);
+				break;
+			case GMMLabelsBackground:
+				if (GMMLabelsBackgroundMat != NULL)
+					surf = convertCV_MatToSDL_Surface(*GMMLabelsBackgroundMat);
+				break;
+			case GMMLabelsForeground:
+				if (GMMLabelsForegroundMat != NULL)
+					surf = convertCV_MatToSDL_Surface(*GMMLabelsForegroundMat);
+				break;
+			default:
+				surf = convertCV_MatToSDL_Surface(*saliencyMat);
+				break;
+		}
+		tex = SDL_CreateTextureFromSurface(ren, surf);
 
 		// Draw image
 		SDL_RenderCopy(ren, tex, NULL, NULL);
 
 		// Draw bounding box
-		SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
-		for (int i = 0 ; i < 4 ; i++) {
-			SDL_RenderDrawLine(ren,boundingBox.points[i].x, boundingBox.points[i].y, boundingBox.points[(i+1)%4].x, boundingBox.points[(i+1)%4].y);
+		if (showBoundingBox) {
+			SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
+			for (int i = 0 ; i < 4 ; i++) {
+				SDL_RenderDrawLine(ren,boundingBox.points[i].x, boundingBox.points[i].y, boundingBox.points[(i+1)%4].x, boundingBox.points[(i+1)%4].y);
+			}
 		}
 
-		//showCentroids(ren, superpixels);
+		// Draw centroids
+		if (drawCentroids) {
+			showCentroids(ren, superpixels);
+		}
 
 		SDL_RenderPresent(ren);
 
@@ -164,8 +230,8 @@ int main( int argc, char** argv )
 			superpixelsIntersectionMat = convertSuperpixelsIntersectionToCV_Mat(superpixels, img.rows, img.cols);
 			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
 			saliencyMat = convertSaliencyToCV_Mat(superpixels, img.rows, img.cols);
-			surf = convertCV_MatToSDL_Surface(saliencyMat);
-			tex = SDL_CreateTextureFromSurface(ren, surf);
+
+			currentlyShown = Saliency;
 
 			boundingBoxDrawn = false;
 		}

@@ -5,6 +5,7 @@
 #include <opencv2/ml/ml.hpp>
 
 #include "BoundingBox.hpp"
+#include "Point.hpp"
 
 cv::Mat* computeProbsBackground(cv::Mat *image);
 cv::Mat* computeProbsForeground(cv::Mat *image, struct BoundingBox bb);

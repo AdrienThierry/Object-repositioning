@@ -21,16 +21,16 @@ struct Superpixel {
 std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, cv::Mat img, int rows, int cols);
 
 // Convert superpixels to an OpenCV matrix
-cv::Mat convertSuperpixelsToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
+cv::Mat* convertSuperpixelsToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
 
 // Convert superpixels intersections to an OpenCV matrix
 // Superpixels entirely outside BB are shown in WHITE
 // Superpixels entirely inside BB are shown in GREY
 // Superpixels that cross BB are shown in BLACK
-cv::Mat convertSuperpixelsIntersectionToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
+cv::Mat* convertSuperpixelsIntersectionToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
 
 // Convert superpixels saliency to an OpenCV matrix
-cv::Mat convertSaliencyToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
+cv::Mat* convertSaliencyToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols);
 
 // Show centroids of superpixels with an SDL_Renderer
 void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels);
