@@ -7,7 +7,7 @@ INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 
 find_package( OpenCV REQUIRED )
-add_executable( object_repositioning src/main.cpp src/opencv_2_sdl.cpp src/Superpixel.cpp src/BoundingBox.cpp src/MeanShift.cpp src/Color.cpp )
+add_executable( object_repositioning src/main.cpp src/opencv_2_sdl.cpp src/Superpixel.cpp src/BoundingBox.cpp src/MeanShift.cpp src/Color.cpp src/foreground_extraction.cpp )
 target_link_libraries( object_repositioning ${OpenCV_LIBS} )
 
 INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS})

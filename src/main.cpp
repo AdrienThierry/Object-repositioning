@@ -10,6 +10,7 @@
 #include "Point.hpp"
 #include "BoundingBox.hpp"
 #include "MeanShift.h"
+#include "foreground_extraction.hpp"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/paques_island.jpg"); // Input image
+	cv::Mat img = cv::imread("data/outside.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -72,10 +73,12 @@ int main( int argc, char** argv )
 	// TEST : show superpixels
 	//--------------------------------------------------------------------------------	
 	cv::Mat superpixelsMat = convertSuperpixelsToCV_Mat(superpixels, img.rows, img.cols);
+	cv::Mat *probsBackground = computeProbsBackground(&superpixelsMat);
+	cv::Mat *probsBackgroundMat = convertProbsToCV_Mat(probsBackground);
 	cv::Mat superpixelsIntersectionMat;
 	cv::Mat saliencyMat;
 
-	SDL_Surface *surf = convertCV_MatToSDL_Surface(superpixelsMat);
+	SDL_Surface *surf = convertCV_MatToSDL_Surface(*probsBackgroundMat);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
 
 	//--------------------------------------------------------------------------------

@@ -77,13 +77,13 @@ float distanceSuperpixelBB(struct Superpixel *superpixel, BoundingBox bb, int ro
 	}
 
 	// Warning : distance has to be normalized (see article)
-	float distance = (float)superpixel.center.x - minX;
-	if (maxX - superpixel.center.x < distance)
-		distance = (maxX - superpixel.center.x) / (float)cols;
-	else if (superpixel.center.y - minY < distance)
-		distance = (superpixel.center.y = minY) / (float)rows;
-	else if (maxY - superpixel.center.y < distance)
-		distance = (maxY - superpixel.center.y) / (float)rows;
+	float distance = (float)superpixel->center.x - minX;
+	if (maxX - superpixel->center.x < distance)
+		distance = (maxX - superpixel->center.x) / (float)cols;
+	else if (superpixel->center.y - minY < distance)
+		distance = (superpixel->center.y = minY) / (float)rows;
+	else if (maxY - superpixel->center.y < distance)
+		distance = (maxY - superpixel->center.y) / (float)rows;
 	else
 		distance /= (float)cols;
 
@@ -92,8 +92,8 @@ float distanceSuperpixelBB(struct Superpixel *superpixel, BoundingBox bb, int ro
 
 float distanceSuperpixels(struct Superpixel *superpixel1, struct Superpixel *superpixel2, int rows, int cols) {
 	float distance = 0;
-	float diffX = ((float)superpixel2.center.x - (float)superpixel1.center.x) / (float)cols;
-	float diffY = ((float)superpixel2.center.y - (float)superpixel1.center.y) / (float)rows;
+	float diffX = ((float)superpixel2->center.x - (float)superpixel1->center.x) / (float)cols;
+	float diffY = ((float)superpixel2->center.y - (float)superpixel1->center.y) / (float)rows;
 
 	distance = sqrt((diffX * diffX) + (diffY * diffY));
 
@@ -133,8 +133,8 @@ void computeSaliencyMap(std::vector<struct Superpixel>* superpixels, struct Boun
 			float saliency = 0.0;
 			for (unsigned int j = 0 ; j < crossingSP.size() ; j++) {
 				float toAdd = 0;
-				toAdd = exp(-1.0 * distanceSuperpixels(superpixels->at(i), *crossingSP.at(j), rows, cols)/(0.5*0.5));
-				toAdd *= (1.0 - exp(-1.0 * distanceSuperpixelBB(superpixels->at(i), bb, rows, cols) / (0.5*0.5)));
+				toAdd = exp(-1.0 * distanceSuperpixels(&superpixels->at(i), crossingSP.at(j), rows, cols)/(0.5*0.5));
+				toAdd *= (1.0 - exp(-1.0 * distanceSuperpixelBB(&superpixels->at(i), bb, rows, cols) / (0.5*0.5)));
 				toAdd *= ((float)crossingSP.at(j)->pixels.size() / nbOfPixelsInCrossingSP);
 
 				struct ColorLab colorI = convertRGB2Lab(superpixels->at(i).color);

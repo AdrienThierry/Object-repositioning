@@ -201,6 +201,30 @@ CMakeFiles/object_repositioning.dir/src/Color.cpp.o.provides: CMakeFiles/object_
 CMakeFiles/object_repositioning.dir/src/Color.cpp.o.provides.build: CMakeFiles/object_repositioning.dir/src/Color.cpp.o
 
 
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: CMakeFiles/object_repositioning.dir/flags.make
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/foreground_extraction.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o -c "/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/foreground_extraction.cpp"
+
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/foreground_extraction.cpp" > CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.i
+
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/foreground_extraction.cpp" -o CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.s
+
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.requires:
+
+.PHONY : CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.requires
+
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.provides: CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.requires
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.provides.build
+.PHONY : CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.provides
+
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.provides.build: CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o
+
+
 # Object files for target object_repositioning
 object_repositioning_OBJECTS = \
 "CMakeFiles/object_repositioning.dir/src/main.cpp.o" \
@@ -208,7 +232,8 @@ object_repositioning_OBJECTS = \
 "CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o" \
 "CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o" \
 "CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o" \
-"CMakeFiles/object_repositioning.dir/src/Color.cpp.o"
+"CMakeFiles/object_repositioning.dir/src/Color.cpp.o" \
+"CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o"
 
 # External object files for target object_repositioning
 object_repositioning_EXTERNAL_OBJECTS =
@@ -219,6 +244,7 @@ object_repositioning: CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o
 object_repositioning: CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o
 object_repositioning: CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o
 object_repositioning: CMakeFiles/object_repositioning.dir/src/Color.cpp.o
+object_repositioning: CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o
 object_repositioning: CMakeFiles/object_repositioning.dir/build.make
 object_repositioning: /usr/lib/libopencv_videostab.so.2.4.12
 object_repositioning: /usr/lib/libopencv_ts.a
@@ -242,7 +268,7 @@ object_repositioning: /usr/lib/libopencv_imgproc.so.2.4.12
 object_repositioning: /usr/lib/libopencv_flann.so.2.4.12
 object_repositioning: /usr/lib/libopencv_core.so.2.4.12
 object_repositioning: CMakeFiles/object_repositioning.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable object_repositioning"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable object_repositioning"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/object_repositioning.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -256,6 +282,7 @@ CMakeFiles/object_repositioning.dir/requires: CMakeFiles/object_repositioning.di
 CMakeFiles/object_repositioning.dir/requires: CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o.requires
 CMakeFiles/object_repositioning.dir/requires: CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o.requires
 CMakeFiles/object_repositioning.dir/requires: CMakeFiles/object_repositioning.dir/src/Color.cpp.o.requires
+CMakeFiles/object_repositioning.dir/requires: CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o.requires
 
 .PHONY : CMakeFiles/object_repositioning.dir/requires
 

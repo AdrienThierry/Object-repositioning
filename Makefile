@@ -231,6 +231,33 @@ src/Superpixel.cpp.s:
 	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.s
 .PHONY : src/Superpixel.cpp.s
 
+src/foreground_extraction.o: src/foreground_extraction.cpp.o
+
+.PHONY : src/foreground_extraction.o
+
+# target to build an object file
+src/foreground_extraction.cpp.o:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o
+.PHONY : src/foreground_extraction.cpp.o
+
+src/foreground_extraction.i: src/foreground_extraction.cpp.i
+
+.PHONY : src/foreground_extraction.i
+
+# target to preprocess a source file
+src/foreground_extraction.cpp.i:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.i
+.PHONY : src/foreground_extraction.cpp.i
+
+src/foreground_extraction.s: src/foreground_extraction.cpp.s
+
+.PHONY : src/foreground_extraction.s
+
+# target to generate assembly for a file
+src/foreground_extraction.cpp.s:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.s
+.PHONY : src/foreground_extraction.cpp.s
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -306,6 +333,9 @@ help:
 	@echo "... src/Superpixel.o"
 	@echo "... src/Superpixel.i"
 	@echo "... src/Superpixel.s"
+	@echo "... src/foreground_extraction.o"
+	@echo "... src/foreground_extraction.i"
+	@echo "... src/foreground_extraction.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

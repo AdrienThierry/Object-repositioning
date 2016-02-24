@@ -18,11 +18,19 @@ CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o: src/Point.hpp
 CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o: src/Superpixel.cpp
 CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o: src/Superpixel.hpp
 
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/BoundingBox.hpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/Color.hpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/Point.hpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/Superpixel.hpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/foreground_extraction.cpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/foreground_extraction.hpp
+
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/BoundingBox.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Color.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/MeanShift.h
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Point.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Superpixel.hpp
+CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/foreground_extraction.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/main.cpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/opencv_2_sdl.hpp
 
