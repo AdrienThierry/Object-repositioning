@@ -87,9 +87,6 @@ int main( int argc, char** argv )
 	IplImage *GMMLabelsForegroundMat = NULL;
 
 
-	// TODO : à enlever
-	//computeGMMBackground(superpixelsMat);
-
 	SDL_Surface *surf = NULL;
 	SDL_Texture *tex = NULL;
 
@@ -241,10 +238,14 @@ int main( int argc, char** argv )
 		if (boundingBoxDrawn) {
 			computeSuperpixelIntersectionWithBB(superpixels, boundingBox);
 			convertSuperpixelsIntersectionToCV_Mat(&superpixelsIntersectionMat, superpixels, img.rows, img.cols);
+
 			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
 			convertSaliencyToCV_Mat(&saliencyMat, superpixels, img.rows, img.cols);
 
-			currentlyShown = Saliency;
+			struct GMM GMMBackground = computeGMMBackground(superpixelsMat);
+			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
+
+			currentlyShown = GMMLabelsBackground;
 
 			boundingBoxDrawn = false;
 		}

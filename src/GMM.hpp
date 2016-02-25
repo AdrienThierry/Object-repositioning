@@ -13,7 +13,7 @@ struct GMM {
 	double weights[NB_GMM_CLUSTERS];
 };
 
-struct GMM computeGMMBackground(cv::Mat *image);
-void convertGMMLabelsToCV_Mat(struct GMM *GMM);
+struct GMM computeGMMBackground(IplImage *imageIpl);
+void convertGMMLabelsToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols);
 
 #endif
