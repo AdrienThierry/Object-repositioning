@@ -47,6 +47,8 @@ opencv2/opencv.hpp
 -
 opencv2/ml/ml.hpp
 -
+BoundingBox.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.hpp
 
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/MeanShift.cpp
 MeanShift.h

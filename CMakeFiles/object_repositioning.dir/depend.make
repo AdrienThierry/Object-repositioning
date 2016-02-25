@@ -10,8 +10,12 @@ CMakeFiles/object_repositioning.dir/src/BoundingBox.cpp.o: src/Superpixel.hpp
 CMakeFiles/object_repositioning.dir/src/Color.cpp.o: src/Color.cpp
 CMakeFiles/object_repositioning.dir/src/Color.cpp.o: src/Color.hpp
 
+CMakeFiles/object_repositioning.dir/src/GMM.cpp.o: src/BoundingBox.hpp
+CMakeFiles/object_repositioning.dir/src/GMM.cpp.o: src/Color.hpp
 CMakeFiles/object_repositioning.dir/src/GMM.cpp.o: src/GMM.cpp
 CMakeFiles/object_repositioning.dir/src/GMM.cpp.o: src/GMM.hpp
+CMakeFiles/object_repositioning.dir/src/GMM.cpp.o: src/Point.hpp
+CMakeFiles/object_repositioning.dir/src/GMM.cpp.o: src/Superpixel.hpp
 
 CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o: src/MeanShift.cpp
 CMakeFiles/object_repositioning.dir/src/MeanShift.cpp.o: src/MeanShift.h

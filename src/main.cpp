@@ -242,10 +242,13 @@ int main( int argc, char** argv )
 			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
 			convertSaliencyToCV_Mat(&saliencyMat, superpixels, img.rows, img.cols);
 
-			struct GMM GMMBackground = computeGMMBackground(superpixelsMat);
-			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
+			//struct GMM GMMBackground = computeGMMBackground(superpixelsMat);
+			//convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
 
-			currentlyShown = GMMLabelsBackground;
+			struct GMM GMMForeground = computeGMMForeground(superpixelsMat, boundingBox);
+			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, &GMMForeground, img.rows, img.cols);
+
+			currentlyShown = GMMLabelsForeground;
 
 			boundingBoxDrawn = false;
 		}
