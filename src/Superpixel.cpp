@@ -88,6 +88,7 @@ void convertSuperpixelsToCV_Mat(IplImage **result, std::vector<struct Superpixel
 		}
 	}
 
+	cvReleaseImage(result);
 	*result = cvCreateImage(cvSize(cols,rows),8,3);
 	IplImage ipltemp = tmpResult;
 	cvCopy(&ipltemp,*result);
@@ -117,6 +118,7 @@ void convertSuperpixelsIntersectionToCV_Mat(IplImage **result, std::vector<struc
 		}
 	}
 
+	cvReleaseImage(result);
 	*result = cvCreateImage(cvSize(cols,rows),8,3);
 	IplImage ipltemp = tmpResult;
 	cvCopy(&ipltemp,*result);
@@ -141,6 +143,7 @@ void convertSaliencyToCV_Mat(IplImage** result, std::vector<struct Superpixel>* 
 		}
 	}
 
+	cvReleaseImage(result);
 	*result = cvCreateImage(cvSize(cols,rows),8,3);
 	IplImage ipltemp = tmpResult;
 	cvCopy(&ipltemp,*result);
