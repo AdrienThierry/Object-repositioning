@@ -74,27 +74,27 @@ std::vector<struct Superpixel>* computeSuperpixels(int** ilabels, cv::Mat img, i
 	return result;
 }
 
-cv::Mat* convertSuperpixelsToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols) {
-	cv::Mat *result = new cv::Mat(rows, cols, CV_8UC3);
-	*result = cv::Mat::zeros(rows, cols, CV_8UC3);
+void convertSuperpixelsToCV_Mat(IplImage **result, std::vector<struct Superpixel>* superpixels, int rows, int cols) {
+	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
 
 	// Create OpenCV matrix
 	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
 		for (unsigned int j = 0 ; j < superpixels->at(i).pixels.size() ; j++) {
 			int row = superpixels->at(i).pixels.at(j).y;
 			int col = superpixels->at(i).pixels.at(j).x;
-			result->data[result->step[0]*row + result->step[1]*col + 0] = superpixels->at(i).color.b;
-			result->data[result->step[0]*row + result->step[1]*col + 1] = superpixels->at(i).color.g;
-			result->data[result->step[0]*row + result->step[1]*col + 2] = superpixels->at(i).color.r;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 0] = superpixels->at(i).color.b;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 1] = superpixels->at(i).color.g;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 2] = superpixels->at(i).color.r;
 		}
 	}
-	
-	return result;
+
+	*result = cvCreateImage(cvSize(cols,rows),8,3);
+	IplImage ipltemp = tmpResult;
+	cvCopy(&ipltemp,*result);
 }	
 
-cv::Mat* convertSuperpixelsIntersectionToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols) {
-	cv::Mat *result = new cv::Mat(rows, cols, CV_8UC3);
-	*result = cv::Mat::zeros(rows, cols, CV_8UC3);
+void convertSuperpixelsIntersectionToCV_Mat(IplImage **result, std::vector<struct Superpixel>* superpixels, int rows, int cols) {
+	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
 
 	int color; // How much white (between 0 and 255)
 
@@ -111,18 +111,19 @@ cv::Mat* convertSuperpixelsIntersectionToCV_Mat(std::vector<struct Superpixel>* 
 		for (unsigned int j = 0 ; j < superpixels->at(i).pixels.size() ; j++) {
 			int row = superpixels->at(i).pixels.at(j).y;
 			int col = superpixels->at(i).pixels.at(j).x;
-			result->data[result->step[0]*row + result->step[1]*col + 0] = color;
-			result->data[result->step[0]*row + result->step[1]*col + 1] = color;
-			result->data[result->step[0]*row + result->step[1]*col + 2] = color;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 0] = color;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 1] = color;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 2] = color;
 		}
 	}
-	
-	return result;
+
+	*result = cvCreateImage(cvSize(cols,rows),8,3);
+	IplImage ipltemp = tmpResult;
+	cvCopy(&ipltemp,*result);
 }
 
-cv::Mat* convertSaliencyToCV_Mat(std::vector<struct Superpixel>* superpixels, int rows, int cols) {
-	cv::Mat *result = new cv::Mat(rows, cols, CV_8UC3);
-	*result = cv::Mat::zeros(rows, cols, CV_8UC3);
+void convertSaliencyToCV_Mat(IplImage** result, std::vector<struct Superpixel>* superpixels, int rows, int cols) {
+	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
 
 	int color; // How much white (between 0 and 255)
 
@@ -134,13 +135,16 @@ cv::Mat* convertSaliencyToCV_Mat(std::vector<struct Superpixel>* superpixels, in
 		for (unsigned int j = 0 ; j < superpixels->at(i).pixels.size() ; j++) {
 			int row = superpixels->at(i).pixels.at(j).y;
 			int col = superpixels->at(i).pixels.at(j).x;
-			result->data[result->step[0]*row + result->step[1]*col + 0] = color;
-			result->data[result->step[0]*row + result->step[1]*col + 1] = color;
-			result->data[result->step[0]*row + result->step[1]*col + 2] = color;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 0] = color;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 1] = color;
+			tmpResult.data[tmpResult.step[0]*row + tmpResult.step[1]*col + 2] = color;
 		}
 	}
-	
-	return result;
+
+	*result = cvCreateImage(cvSize(cols,rows),8,3);
+	IplImage ipltemp = tmpResult;
+	cvCopy(&ipltemp,*result);
+
 }
 
 void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels) {

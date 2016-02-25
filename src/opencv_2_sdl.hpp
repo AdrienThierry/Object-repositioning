@@ -5,6 +5,6 @@
 #include <SDL2/SDL.h>
 #include <opencv2/opencv.hpp>
 
-SDL_Surface* convertCV_MatToSDL_Surface(const cv::Mat &matImg);
+void convertCV_MatToSDL_Surface(SDL_Surface **result, IplImage *image);
 
 #endif

@@ -177,6 +177,33 @@ src/Color.cpp.s:
 	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/Color.cpp.s
 .PHONY : src/Color.cpp.s
 
+src/GMM.o: src/GMM.cpp.o
+
+.PHONY : src/GMM.o
+
+# target to build an object file
+src/GMM.cpp.o:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/GMM.cpp.o
+.PHONY : src/GMM.cpp.o
+
+src/GMM.i: src/GMM.cpp.i
+
+.PHONY : src/GMM.i
+
+# target to preprocess a source file
+src/GMM.cpp.i:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/GMM.cpp.i
+.PHONY : src/GMM.cpp.i
+
+src/GMM.s: src/GMM.cpp.s
+
+.PHONY : src/GMM.s
+
+# target to generate assembly for a file
+src/GMM.cpp.s:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/GMM.cpp.s
+.PHONY : src/GMM.cpp.s
+
 src/MeanShift.o: src/MeanShift.cpp.o
 
 .PHONY : src/MeanShift.o
@@ -327,6 +354,9 @@ help:
 	@echo "... src/Color.o"
 	@echo "... src/Color.i"
 	@echo "... src/Color.s"
+	@echo "... src/GMM.o"
+	@echo "... src/GMM.i"
+	@echo "... src/GMM.s"
 	@echo "... src/MeanShift.o"
 	@echo "... src/MeanShift.i"
 	@echo "... src/MeanShift.s"

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -11,6 +12,7 @@
 #include "BoundingBox.hpp"
 #include "MeanShift.h"
 #include "foreground_extraction.hpp"
+#include "GMM.hpp"
 
 using namespace std;
 
@@ -76,15 +78,20 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Matrix declarations
 	//--------------------------------------------------------------------------------	
-	cv::Mat *superpixelsMat = convertSuperpixelsToCV_Mat(superpixels, img.rows, img.cols);
-	cv::Mat *superpixelsIntersectionMat = NULL;
-	cv::Mat *saliencyMat = NULL;
-	cv::Mat *GMMLabelsBackgroundMat = NULL;
-	cv::Mat *GMMLabelsForegroundMat = NULL;
+	IplImage *superpixelsMat = NULL;
+	convertSuperpixelsToCV_Mat(&superpixelsMat, superpixels, img.rows, img.cols);
+
+	IplImage *superpixelsIntersectionMat = NULL;
+	IplImage *saliencyMat = NULL;
+	IplImage *GMMLabelsBackgroundMat = NULL;
+	IplImage *GMMLabelsForegroundMat = NULL;
 
 
-	SDL_Surface *surf;
-	SDL_Texture *tex;
+	// TODO : à enlever
+	//computeGMMBackground(superpixelsMat);
+
+	SDL_Surface *surf = NULL;
+	SDL_Texture *tex = NULL;
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
@@ -179,32 +186,38 @@ int main( int argc, char** argv )
 		// Load image to show in SDL_Surface and texture
 		switch(currentlyShown) {
 			case BaseImage:
-				surf = convertCV_MatToSDL_Surface(img);
+				convertCV_MatToSDL_Surface(&surf, img2);
 				break;
 			case Superpixels:
-				if (superpixelsMat != NULL)
-					surf = convertCV_MatToSDL_Surface(*superpixelsMat);
+				if (superpixelsMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, superpixelsMat);
+				}
 				break;
 			case SuperpixelsIntersection:
-				if (superpixelsIntersectionMat != NULL)
-					surf = convertCV_MatToSDL_Surface(*superpixelsIntersectionMat);
+				if (superpixelsIntersectionMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, superpixelsIntersectionMat);
+				}
 				break;
 			case Saliency:
-				if (saliencyMat != NULL)
-					surf = convertCV_MatToSDL_Surface(*saliencyMat);
+				if (saliencyMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, saliencyMat);
+				}
 				break;
 			case GMMLabelsBackground:
-				if (GMMLabelsBackgroundMat != NULL)
-					surf = convertCV_MatToSDL_Surface(*GMMLabelsBackgroundMat);
+				if (GMMLabelsBackgroundMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, GMMLabelsBackgroundMat);
+				}
 				break;
 			case GMMLabelsForeground:
-				if (GMMLabelsForegroundMat != NULL)
-					surf = convertCV_MatToSDL_Surface(*GMMLabelsForegroundMat);
+				if (GMMLabelsForegroundMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, GMMLabelsForegroundMat);
+				}
 				break;
 			default:
-				surf = convertCV_MatToSDL_Surface(*saliencyMat);
+				convertCV_MatToSDL_Surface(&surf, img2);
 				break;
 		}
+		SDL_DestroyTexture(tex);
 		tex = SDL_CreateTextureFromSurface(ren, surf);
 
 		// Draw image
@@ -227,9 +240,9 @@ int main( int argc, char** argv )
 
 		if (boundingBoxDrawn) {
 			computeSuperpixelIntersectionWithBB(superpixels, boundingBox);
-			superpixelsIntersectionMat = convertSuperpixelsIntersectionToCV_Mat(superpixels, img.rows, img.cols);
+			convertSuperpixelsIntersectionToCV_Mat(&superpixelsIntersectionMat, superpixels, img.rows, img.cols);
 			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
-			saliencyMat = convertSaliencyToCV_Mat(superpixels, img.rows, img.cols);
+			convertSaliencyToCV_Mat(&saliencyMat, superpixels, img.rows, img.cols);
 
 			currentlyShown = Saliency;
 
