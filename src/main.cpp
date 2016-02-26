@@ -33,7 +33,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/musician.jpg"); // Input image
+	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;

@@ -37,6 +37,64 @@ void assignDataTerm(GraphType *g, struct GMM* GMMForeground, struct GMM* GMMBack
 	}
 }
 
+void assignSmoothnessTerm(GraphType *g, IplImage *image, int rows, int cols) {
+	cv::Mat imageMat(image, true);
+	
+	// Left-right weights
+	for (int i = 0 ; i < rows ; i++) {
+		for (int j = 0 ; j < cols-1 ; j++) {
+			
+			float weight = 0.0;
+			struct Color color1, color2;
+			struct ColorLab color1Lab, color2Lab;
+
+			color1.r = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*j + 2];
+			color1.g = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*j + 1];
+			color1.b = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*j + 0];
+			
+			color2.r = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*(j+1) + 2];
+			color2.g = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*(j+1) + 1];
+			color2.b = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*(j+1) + 0];
+
+			color1Lab = convertRGB2Lab(color1);
+			color2Lab = convertRGB2Lab(color2);
+
+			float dist = distanceLab(color1Lab, color2Lab);
+
+			weight = LAMBDA * exp(-1.0 * dist * dist / (2.0 * (float)SIGMA * (float)SIGMA));
+
+			g -> add_edge( i*cols+j, i*cols+(j+1), /* capacities */ weight , weight );
+		}
+	}
+
+	// Top-bottom weights
+	for (int i = 0 ; i < rows-1 ; i++) {
+		for (int j = 0 ; j < cols ; j++) {
+			
+			float weight = 0.0;
+			struct Color color1, color2;
+			struct ColorLab color1Lab, color2Lab;
+
+			color1.r = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*j + 2];
+			color1.g = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*j + 1];
+			color1.b = imageMat.data[imageMat.step[0]*i + imageMat.step[1]*j + 0];
+			
+			color2.r = imageMat.data[imageMat.step[0]*(i+1) + imageMat.step[1]*j + 2];
+			color2.g = imageMat.data[imageMat.step[0]*(i+1) + imageMat.step[1]*j + 1];
+			color2.b = imageMat.data[imageMat.step[0]*(i+1) + imageMat.step[1]*j + 0];
+
+			color1Lab = convertRGB2Lab(color1);
+			color2Lab = convertRGB2Lab(color2);
+
+			float dist = distanceLab(color1Lab, color2Lab);
+
+			weight = LAMBDA * exp(-1.0 * dist * dist / (2.0 * (float)SIGMA * (float)SIGMA));
+
+			g -> add_edge( i*cols+j, (i+1)*cols+j, /* capacities */ weight , weight );
+		}
+	}
+}
+
 void extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols) {
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
 	cv::Mat inputMat(input, true);
@@ -46,6 +104,7 @@ void extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForegr
 
 	// Assign weights
 	assignDataTerm(g, GMMForeground, GMMBackground, bb, rows, cols);
+	assignSmoothnessTerm(g, input, rows, cols);
 
 	// Perform graph cut
 	g -> maxflow();
