@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/ml/ml.hpp>
+#include <vector>
 
 #include "BoundingBox.hpp"
 
@@ -10,13 +11,15 @@
 
 struct GMM {
 	cv::EM model;
-	cv::Mat probs;
-	cv::Mat labels;
-	double weights[NB_GMM_CLUSTERS];
+	std::vector<std::vector<double> > probs;
+	std::vector<std::vector<int> > labels;
+	std::vector<std::vector<double> > weightedLL; // Weighted minux log likelihoods
+	double weights[NB_GMM_CLUSTERS]; // Weights of the GMM components
 };
 
-struct GMM computeGMMBackground(IplImage *imageIpl);
-struct GMM computeGMMForeground(IplImage *imageIpl, struct BoundingBox bb);
+struct GMM computeGMM(IplImage *imageIpl);
+void computeWeightedLogLikelihoods(struct GMM* gmm);
 void convertGMMLabelsToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols);
+void convertGMMWeightedLLToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols);
 
 #endif

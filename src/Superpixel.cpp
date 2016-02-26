@@ -127,11 +127,18 @@ void convertSuperpixelsIntersectionToCV_Mat(IplImage **result, std::vector<struc
 void convertSaliencyToCV_Mat(IplImage** result, std::vector<struct Superpixel>* superpixels, int rows, int cols) {
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
 
+	// Find max of saliency for normalization
+	float maxSaliency = 0.0;
+	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
+		if (superpixels->at(i).saliency > maxSaliency)
+			maxSaliency = superpixels->at(i).saliency;
+	}
+
 	int color; // How much white (between 0 and 255)
 
 	// Create OpenCV matrix
 	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
-		color = (int)(255.0 * superpixels->at(i).saliency);
+		color = (int)(255.0 * superpixels->at(i).saliency / maxSaliency);
 
 
 		for (unsigned int j = 0 ; j < superpixels->at(i).pixels.size() ; j++) {

@@ -22,7 +22,8 @@ typedef struct BoundingBox BoundingBox;
 
 int main( int argc, char** argv )
 {
-	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, GMMLabelsBackground, GMMLabelsForeground};
+	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
+					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedLLBackground, GMMWeightedLLForeground};
 	WhatToShow currentlyShown = BaseImage;
 	bool drawCentroids = false;
 	bool showBoundingBox = true;
@@ -31,7 +32,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
+	cv::Mat img = cv::imread("data/musician.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -85,7 +86,8 @@ int main( int argc, char** argv )
 	IplImage *saliencyMat = NULL;
 	IplImage *GMMLabelsBackgroundMat = NULL;
 	IplImage *GMMLabelsForegroundMat = NULL;
-
+	IplImage *GMMWeightedLLBackgroundMat = NULL;
+	IplImage *GMMWeightedLLForegroundMat = NULL;
 
 	SDL_Surface *surf = NULL;
 	SDL_Texture *tex = NULL;
@@ -113,23 +115,29 @@ int main( int argc, char** argv )
 			//--------------------------------------------------------------------------------
 			if (e.type == SDL_KEYDOWN) {
 				switch(e.key.keysym.sym) {
-					case SDLK_KP_1:
+					case SDLK_KP_0:
 						currentlyShown = BaseImage;
 						break;
-					case SDLK_KP_2:
+					case SDLK_KP_1:
 						currentlyShown = Superpixels;
 						break;
-					case SDLK_KP_3:
+					case SDLK_KP_2:
 						currentlyShown = SuperpixelsIntersection;
 						break;
-					case SDLK_KP_4:
+					case SDLK_KP_3:
 						currentlyShown = Saliency;
 						break;
-					case SDLK_KP_5:
+					case SDLK_KP_4:
 						currentlyShown = GMMLabelsBackground;
 						break;
-					case SDLK_KP_6:
+					case SDLK_KP_5:
 						currentlyShown = GMMLabelsForeground;
+						break;
+					case SDLK_KP_6:
+						currentlyShown = GMMWeightedLLBackground;
+						break;
+					case SDLK_KP_7:
+						currentlyShown = GMMWeightedLLForeground;
 						break;
 					default:
 						currentlyShown = BaseImage;
@@ -210,6 +218,16 @@ int main( int argc, char** argv )
 					convertCV_MatToSDL_Surface(&surf, GMMLabelsForegroundMat);
 				}
 				break;
+			case GMMWeightedLLBackground:
+				if (GMMWeightedLLBackgroundMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, GMMWeightedLLBackgroundMat);
+				}
+				break;
+			case GMMWeightedLLForeground:
+				if (GMMWeightedLLForegroundMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, GMMWeightedLLForegroundMat);
+				}
+				break;
 			default:
 				convertCV_MatToSDL_Surface(&surf, img2);
 				break;
@@ -242,13 +260,11 @@ int main( int argc, char** argv )
 			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
 			convertSaliencyToCV_Mat(&saliencyMat, superpixels, img.rows, img.cols);
 
-			//struct GMM GMMBackground = computeGMMBackground(superpixelsMat);
-			//convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
+			struct GMM GMMBackground = computeGMM(superpixelsMat);
+			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
+			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLBackgroundMat, &GMMBackground, img.rows, img.cols);
 
-			struct GMM GMMForeground = computeGMMForeground(superpixelsMat, boundingBox);
-			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, &GMMForeground, img.rows, img.cols);
-
-			currentlyShown = GMMLabelsForeground;
+			currentlyShown = GMMLabelsBackground;
 
 			boundingBoxDrawn = false;
 		}

@@ -39,6 +39,8 @@ Color.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/GMM.cpp
 stdio.h
 -
+cmath
+-
 GMM.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/GMM.hpp
 
@@ -46,6 +48,8 @@ GMM.hpp
 opencv2/opencv.hpp
 -
 opencv2/ml/ml.hpp
+-
+vector
 -
 BoundingBox.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.hpp
