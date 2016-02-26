@@ -27,10 +27,18 @@ CMakeFiles/object_repositioning.dir/src/Superpixel.cpp.o: src/Superpixel.hpp
 
 CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/BoundingBox.hpp
 CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/Color.hpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/GMM.hpp
 CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/Point.hpp
 CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/Superpixel.hpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/block.h
 CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/foreground_extraction.cpp
 CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/foreground_extraction.hpp
+CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.o: src/graph.h
+
+CMakeFiles/object_repositioning.dir/src/graph.cpp.o: src/block.h
+CMakeFiles/object_repositioning.dir/src/graph.cpp.o: src/graph.cpp
+CMakeFiles/object_repositioning.dir/src/graph.cpp.o: src/graph.h
+CMakeFiles/object_repositioning.dir/src/graph.cpp.o: src/instances.inc
 
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/BoundingBox.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Color.hpp
@@ -38,9 +46,16 @@ CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/GMM.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/MeanShift.h
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Point.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Superpixel.hpp
+CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/block.h
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/foreground_extraction.hpp
+CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/graph.h
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/main.cpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/opencv_2_sdl.hpp
+
+CMakeFiles/object_repositioning.dir/src/maxflow.cpp.o: src/block.h
+CMakeFiles/object_repositioning.dir/src/maxflow.cpp.o: src/graph.h
+CMakeFiles/object_repositioning.dir/src/maxflow.cpp.o: src/instances.inc
+CMakeFiles/object_repositioning.dir/src/maxflow.cpp.o: src/maxflow.cpp
 
 CMakeFiles/object_repositioning.dir/src/opencv_2_sdl.cpp.o: src/opencv_2_sdl.cpp
 CMakeFiles/object_repositioning.dir/src/opencv_2_sdl.cpp.o: src/opencv_2_sdl.hpp

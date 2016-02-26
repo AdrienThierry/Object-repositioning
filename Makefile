@@ -285,6 +285,33 @@ src/foreground_extraction.cpp.s:
 	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/foreground_extraction.cpp.s
 .PHONY : src/foreground_extraction.cpp.s
 
+src/graph.o: src/graph.cpp.o
+
+.PHONY : src/graph.o
+
+# target to build an object file
+src/graph.cpp.o:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/graph.cpp.o
+.PHONY : src/graph.cpp.o
+
+src/graph.i: src/graph.cpp.i
+
+.PHONY : src/graph.i
+
+# target to preprocess a source file
+src/graph.cpp.i:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/graph.cpp.i
+.PHONY : src/graph.cpp.i
+
+src/graph.s: src/graph.cpp.s
+
+.PHONY : src/graph.s
+
+# target to generate assembly for a file
+src/graph.cpp.s:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/graph.cpp.s
+.PHONY : src/graph.cpp.s
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -311,6 +338,33 @@ src/main.s: src/main.cpp.s
 src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/maxflow.o: src/maxflow.cpp.o
+
+.PHONY : src/maxflow.o
+
+# target to build an object file
+src/maxflow.cpp.o:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/maxflow.cpp.o
+.PHONY : src/maxflow.cpp.o
+
+src/maxflow.i: src/maxflow.cpp.i
+
+.PHONY : src/maxflow.i
+
+# target to preprocess a source file
+src/maxflow.cpp.i:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/maxflow.cpp.i
+.PHONY : src/maxflow.cpp.i
+
+src/maxflow.s: src/maxflow.cpp.s
+
+.PHONY : src/maxflow.s
+
+# target to generate assembly for a file
+src/maxflow.cpp.s:
+	$(MAKE) -f CMakeFiles/object_repositioning.dir/build.make CMakeFiles/object_repositioning.dir/src/maxflow.cpp.s
+.PHONY : src/maxflow.cpp.s
 
 src/opencv_2_sdl.o: src/opencv_2_sdl.cpp.o
 
@@ -366,9 +420,15 @@ help:
 	@echo "... src/foreground_extraction.o"
 	@echo "... src/foreground_extraction.i"
 	@echo "... src/foreground_extraction.s"
+	@echo "... src/graph.o"
+	@echo "... src/graph.i"
+	@echo "... src/graph.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/maxflow.o"
+	@echo "... src/maxflow.i"
+	@echo "... src/maxflow.s"
 	@echo "... src/opencv_2_sdl.o"
 	@echo "... src/opencv_2_sdl.i"
 	@echo "... src/opencv_2_sdl.s"

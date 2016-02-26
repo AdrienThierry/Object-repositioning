@@ -13,6 +13,7 @@
 #include "MeanShift.h"
 #include "foreground_extraction.hpp"
 #include "GMM.hpp"
+#include "graph.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ typedef struct BoundingBox BoundingBox;
 int main( int argc, char** argv )
 {
 	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
-					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedLLBackground, GMMWeightedLLForeground};
+					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedLLBackground, GMMWeightedLLForeground, ExtractedForeground};
 	WhatToShow currentlyShown = BaseImage;
 	bool drawCentroids = false;
 	bool showBoundingBox = true;
@@ -32,7 +33,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
+	cv::Mat img = cv::imread("data/musician.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -88,6 +89,7 @@ int main( int argc, char** argv )
 	IplImage *GMMLabelsForegroundMat = NULL;
 	IplImage *GMMWeightedLLBackgroundMat = NULL;
 	IplImage *GMMWeightedLLForegroundMat = NULL;
+	IplImage *extractedForegroundMat = NULL;
 
 	SDL_Surface *surf = NULL;
 	SDL_Texture *tex = NULL;
@@ -138,6 +140,9 @@ int main( int argc, char** argv )
 						break;
 					case SDLK_KP_7:
 						currentlyShown = GMMWeightedLLForeground;
+						break;
+					case SDLK_KP_8:
+						currentlyShown = ExtractedForeground;
 						break;
 					default:
 						currentlyShown = BaseImage;
@@ -228,6 +233,11 @@ int main( int argc, char** argv )
 					convertCV_MatToSDL_Surface(&surf, GMMWeightedLLForegroundMat);
 				}
 				break;
+			case ExtractedForeground:
+				if (extractedForegroundMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, extractedForegroundMat);
+				}
+				break;
 			default:
 				convertCV_MatToSDL_Surface(&surf, img2);
 				break;
@@ -260,10 +270,9 @@ int main( int argc, char** argv )
 			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
 			convertSaliencyToCV_Mat(&saliencyMat, superpixels, img.rows, img.cols);
 
-//			struct GMM GMMBackground = computeGMM(superpixelsMat);
-//			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
-//			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLBackgroundMat, &GMMBackground, img.rows, img.cols);
-
+			struct GMM GMMBackground = computeGMM(superpixelsMat);
+			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
+			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLBackgroundMat, &GMMBackground, img.rows, img.cols);
 
 			IplImage foreground = preProcessingForegroundGMM(superpixelsMat, boundingBox);
 			struct GMM GMMForeground = computeGMM(&foreground);
@@ -271,7 +280,15 @@ int main( int argc, char** argv )
 			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, &GMMForeground, img.rows, img.cols);			
 			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLForegroundMat, &GMMForeground, img.rows, img.cols);
 
-			currentlyShown = Superpixels;
+			extractForeground(	img2, 
+								&extractedForegroundMat, 
+								&GMMForeground,
+								&GMMBackground,
+								boundingBox,
+								img.rows,
+								img.cols );
+
+			currentlyShown = ExtractedForeground;
 
 			boundingBoxDrawn = false;
 		}
