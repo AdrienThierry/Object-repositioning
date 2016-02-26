@@ -51,6 +51,72 @@ struct GMM computeGMM(IplImage *imageIpl) {
 	return result;
 }
 
+IplImage preProcessingForegroundGMM(IplImage *image, BoundingBox bb) {
+	// Determine min x, max x, min y and max y in bounding box
+	computeBBEnds(&bb);
+	int minX = bb.ends[0];
+	int maxX = bb.ends[1];
+	int minY = bb.ends[2];
+	int maxY = bb.ends[3];
+
+	cv::Mat imageMat(image, true);
+	cv::Mat resultMat = cv::Mat::zeros(maxY-minY+1, maxX-minX+1, CV_8UC3);
+
+	// Create new image
+	for (int i = 0 ; i < resultMat.rows ; i++) {
+		for (int j = 0 ; j < resultMat.cols ; j++) {
+			resultMat.data[resultMat.step[0]*i + resultMat.step[1]*j + 0] = imageMat.data[imageMat.step[0]*(i+minY) + imageMat.step[1]*(j+minX) + 0];
+			resultMat.data[resultMat.step[0]*i + resultMat.step[1]*j + 1] = imageMat.data[imageMat.step[0]*(i+minY) + imageMat.step[1]*(j+minX) + 1];
+			resultMat.data[resultMat.step[0]*i + resultMat.step[1]*j + 2] = imageMat.data[imageMat.step[0]*(i+minY) + imageMat.step[1]*(j+minX) + 2];
+		}
+	}
+
+	IplImage result = resultMat;
+
+	return result;
+}
+
+void postProcessingForegroundGMM(struct GMM *GMM, BoundingBox bb, int rows, int cols) {
+	// Determine min x, max x, min y and max y in bounding box
+	computeBBEnds(&bb);
+	int minX = bb.ends[0];
+	//int maxX = bb.ends[1];
+	int minY = bb.ends[2];
+	//int maxY = bb.ends[3];
+
+	std::vector<std::vector<double> > newProbs;
+	std::vector<std::vector<int> > newLabels;
+	std::vector<std::vector<double> > newWeightedLL;
+
+	for (int i = 0 ; i < rows ; i++) {
+		std::vector<double> newProbsRow;
+		std::vector<int> newLabelsRow;
+		std::vector<double> newWeightedLLRow;
+		for (int j = 0 ; j < cols ; j++) {
+			Point currentPixel;
+			currentPixel.x = j;
+			currentPixel.y = i;
+			if (isInsideBB(currentPixel, bb)) {
+				newProbsRow.push_back(GMM->probs.at(i-minY).at(j-minX));
+				newLabelsRow.push_back(GMM->labels.at(i-minY).at(j-minX));
+				newWeightedLLRow.push_back(GMM->weightedLL.at(i-minY).at(j-minX));
+			}
+			else {
+				newProbsRow.push_back(0.0);
+				newLabelsRow.push_back(0);
+				newWeightedLLRow.push_back(0.0);
+			}
+		}
+		newProbs.push_back(newProbsRow);
+		newLabels.push_back(newLabelsRow);
+		newWeightedLL.push_back(newWeightedLLRow);
+	}
+
+	GMM->probs = newProbs;
+	GMM->labels = newLabels;
+	GMM->weightedLL = newWeightedLL;
+}
+
 
 void convertGMMLabelsToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols) {
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);

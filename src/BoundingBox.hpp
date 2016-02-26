@@ -9,10 +9,14 @@
 
 struct BoundingBox {
 	Point points[4];
+	int ends[4];
 };
 
 // Returns true if point is inside bb
 bool isInsideBB(Point point, BoundingBox bb);
+
+// Returns minX, maxX, minY and maxY for bounding box
+void computeBBEnds(BoundingBox *bb);
 
 // Compute intersection values of all superpixels in superpixels
 void computeSuperpixelIntersectionWithBB(std::vector<struct Superpixel>* superpixels, BoundingBox bb);

@@ -4,25 +4,40 @@
 #include "BoundingBox.hpp"
 #include "Color.hpp"
 
+void computeBBEnds(BoundingBox *bb) {
+
+	int minX = bb->points[0].x;
+	int maxX = bb->points[0].x;
+	int minY = bb->points[0].y;
+	int maxY = bb->points[0].y;
+	for (int i = 0 ; i < 4 ; i++) {
+		if (bb->points[i].x < minX)
+			minX = bb->points[i].x;
+
+		if (bb->points[i].x > maxX)
+			maxX = bb->points[i].x;
+
+		if (bb->points[i].y < minY)
+			minY = bb->points[i].y;
+	
+		if (bb->points[i].y > maxY)
+			maxY = bb->points[i].y;
+	}
+
+	bb->ends[0] = minX;
+	bb->ends[1] = maxX;
+	bb->ends[2] = minY;
+	bb->ends[3] = maxY;
+
+}
+
 bool isInsideBB(Point point, BoundingBox bb) {
 	// Determine min x, max x, min y and max y in bounding box
-	int minX = bb.points[0].x;
-	int maxX = bb.points[0].x;
-	int minY = bb.points[0].y;
-	int maxY = bb.points[0].y;
-	for (int i = 0 ; i < 4 ; i++) {
-		if (bb.points[i].x < minX)
-			minX = bb.points[i].x;
-
-		if (bb.points[i].x > maxX)
-			maxX = bb.points[i].x;
-
-		if (bb.points[i].y < minY)
-			minY = bb.points[i].y;
-	
-		if (bb.points[i].y > maxY)
-			maxY = bb.points[i].y;
-	}
+	computeBBEnds(&bb);
+	int minX = bb.ends[0];
+	int maxX = bb.ends[1];
+	int minY = bb.ends[2];
+	int maxY = bb.ends[3];
 
 	if (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY)
 		return true;

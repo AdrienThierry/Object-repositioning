@@ -32,7 +32,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/musician.jpg"); // Input image
+	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -260,11 +260,18 @@ int main( int argc, char** argv )
 			computeSaliencyMap(superpixels, boundingBox, img.rows, img.cols);
 			convertSaliencyToCV_Mat(&saliencyMat, superpixels, img.rows, img.cols);
 
-			struct GMM GMMBackground = computeGMM(superpixelsMat);
-			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
-			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLBackgroundMat, &GMMBackground, img.rows, img.cols);
+//			struct GMM GMMBackground = computeGMM(superpixelsMat);
+//			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
+//			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLBackgroundMat, &GMMBackground, img.rows, img.cols);
 
-			currentlyShown = GMMLabelsBackground;
+
+			IplImage foreground = preProcessingForegroundGMM(superpixelsMat, boundingBox);
+			struct GMM GMMForeground = computeGMM(&foreground);
+			postProcessingForegroundGMM(&GMMForeground, boundingBox, img.rows, img.cols);
+			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, &GMMForeground, img.rows, img.cols);			
+			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLForegroundMat, &GMMForeground, img.rows, img.cols);
+
+			currentlyShown = Superpixels;
 
 			boundingBoxDrawn = false;
 		}
