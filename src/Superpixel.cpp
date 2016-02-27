@@ -173,3 +173,51 @@ void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixel
 	}
 }
 
+std::vector<float> getSaliencyBackgroundLUT(std::vector<struct Superpixel>* superpixels, int rows, int cols) {
+	std::vector<float> result(rows*cols);
+
+	for (int i = 0 ; i < rows*cols ; i++) {
+		result.at(i) = 0.0;
+	}
+
+	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
+		for (unsigned int j = 0 ; j < superpixels->at(i).pixels.size() ; j++) {
+			int row = superpixels->at(i).pixels.at(j).y;
+			int col = superpixels->at(i).pixels.at(j).x;
+			result.at(row*cols+col) = 1.0 - superpixels->at(i).saliency; // WARNING : 1 - saliency for background (see article)
+		}
+	}
+
+	return result;
+
+}
+
+std::vector<float> getSaliencyForegroundLUT(std::vector<struct Superpixel>* superpixels, struct BoundingBox bb) {
+	// Determine min x, max x, min y and max y in bounding box
+	computeBBEnds(&bb);
+	int minX = bb.ends[0];
+	int maxX = bb.ends[1];
+	int minY = bb.ends[2];
+	int maxY = bb.ends[3];
+
+	int rows = maxY - minY + 1;
+	int cols = maxX - minX + 1;
+
+	std::vector<float> result(rows*cols);
+
+	for (int i = 0 ; i < rows*cols ; i++) {
+		result.at(i) = 0.0;
+	}
+
+	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
+		for (unsigned int j = 0 ; j < superpixels->at(i).pixels.size() ; j++) {
+			int row = superpixels->at(i).pixels.at(j).y;
+			int col = superpixels->at(i).pixels.at(j).x;
+			if (row >= minY && row <= maxY && col >= minX && col <= maxX)
+				result.at((row-minY)*cols+(col-minX)) = superpixels->at(i).saliency;
+		}
+	}
+
+	return result;
+}
+

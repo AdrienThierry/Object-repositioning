@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include "Point.hpp"
 #include "Color.hpp"
+#include "BoundingBox.hpp"
 
 typedef enum {INTERSECT, INSIDE, OUTSIDE} IntersectionWithBB;
 
@@ -34,5 +35,8 @@ void convertSaliencyToCV_Mat(IplImage **result, std::vector<struct Superpixel>* 
 
 // Show centroids of superpixels with an SDL_Renderer
 void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels);
+
+std::vector<float> getSaliencyBackgroundLUT(std::vector<struct Superpixel>* superpixels, int rows, int cols);
+std::vector<float> getSaliencyForegroundLUT(std::vector<struct Superpixel>* superpixels, struct BoundingBox bb);
 
 #endif

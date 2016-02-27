@@ -17,14 +17,13 @@ struct GMM {
 	double weights[NB_GMM_CLUSTERS]; // Weights of the GMM components
 };
 
-struct GMM computeGMM(IplImage *imageIpl);
+struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT);
 
 IplImage preProcessingForegroundGMM(IplImage *image, BoundingBox bb); // Creates an image that only contains the pixels inside the bounding box
 
 // Completes GMM model with black pixels around bounding box. "rows" and "cols" are RESULTING size
 void postProcessingForegroundGMM(struct GMM *GMM, BoundingBox bb, int rows, int cols);
 
-void computeWeightedLogLikelihoods(struct GMM* gmm);
 void convertGMMLabelsToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols);
 void convertGMMWeightedLLToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols);
 

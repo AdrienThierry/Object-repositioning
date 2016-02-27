@@ -101,6 +101,8 @@ Point.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Point.hpp
 Color.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Color.hpp
+BoundingBox.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.hpp
 
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/block.h
 block.h

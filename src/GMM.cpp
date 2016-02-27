@@ -2,7 +2,7 @@
 #include <cmath>
 #include "GMM.hpp"
 
-struct GMM computeGMM(IplImage *imageIpl) {
+struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT) {
 	struct GMM result;	
 
 	cv::Mat image(imageIpl, true);
@@ -41,9 +41,11 @@ struct GMM computeGMM(IplImage *imageIpl) {
 	for (int i = 0 ; i < image.rows ; i++) {
 		std::vector<double> row;
 		for (int j = 0 ; j < image.cols ; j++) {
+			float saliency = saliencyLUT->at(i*image.cols+j);
+
 			row.push_back(
-				-1.0 * log(result.probs.at(i).at(j))
-				-1.0 * log(result.weights[result.labels.at(i).at(j)]));
+				-1.0 * log(result.probs.at(i).at(j) * saliency)
+				-1.0 * log(result.weights[result.labels.at(i).at(j)]) * saliency);
 		}
 		result.weightedLL.push_back(row);
 	}
