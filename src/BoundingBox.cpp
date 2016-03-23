@@ -162,4 +162,17 @@ void computeSaliencyMap(std::vector<struct Superpixel>* superpixels, struct Boun
 			superpixels->at(i).saliency = saliency;
 		}
 	}
+
+	// Normalize saliency (1 for max saliency)
+	// Find max of saliency for normalization
+	float maxSaliency = 0.0;
+	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
+		if (superpixels->at(i).saliency > maxSaliency)
+			maxSaliency = superpixels->at(i).saliency;
+	}
+	
+	// Normalize saliency
+	for (unsigned int i = 0 ; i < superpixels->size() ; i++) {
+		superpixels->at(i).saliency = superpixels->at(i).saliency / maxSaliency;
+	}
 }

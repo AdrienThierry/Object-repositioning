@@ -12,7 +12,7 @@
 #include "GMM.hpp"
 
 #define SIGMA 1.0 // Sigma for smoothness term
-#define LAMBDA 1.0 // Relative importance of the smoothness term
+#define LAMBDA 0.5 // Relative importance of the smoothness term
 
 typedef Graph<int,int,int> GraphType; // SOURCE = foreground, SINK = background
 

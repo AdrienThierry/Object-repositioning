@@ -16,25 +16,37 @@ struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT) {
 	image.reshape(1,image.rows*image.cols).convertTo(samples,CV_64FC1,1.0/255.0);
 	model.train(samples, logLikelihood, labels, probs);
 
-	probs = probs.reshape(NB_GMM_CLUSTERS, image.rows);
+	//probs = probs.reshape(NB_GMM_CLUSTERS, image.rows);
 	labels = labels.reshape(1, image.rows);
-
-	// Get probs and labels
-	for (int i = 0 ; i < image.rows ; i++) {
-		std::vector<double> probsRow;
-		std::vector<int> labelsRow;
-		for (int j = 0 ; j < image.cols ; j++) {
-			labelsRow.push_back((int)(labels.data[labels.step[0]*i + labels.step[1]*j]));
-			probsRow.push_back((double)(probs.data[probs.step[0]*i + probs.step[1]*j + labelsRow.back()]) / 255.0);
-		}
-		result.probs.push_back(probsRow);
-		result.labels.push_back(labelsRow);
-	}
 
 	// Get GMM weights
 	for (int i = 0 ; i < NB_GMM_CLUSTERS ; i++) {
 		cv::Mat weights = model.get<cv::Mat>("weights");
-		result.weights[i] = (double)(weights.data[weights.step[0]*i + weights.step[1]*0] / 255.0);
+		result.weights[i] = weights.at<double>(0,i);
+	}
+
+	// Get labels
+	for (int i = 0 ; i < image.rows ; i++) {
+		std::vector<int> labelsRow;
+		for (int j = 0 ; j < image.cols ; j++) {
+			labelsRow.push_back((int)(labels.data[labels.step[0]*i + labels.step[1]*j]));
+		}
+		result.labels.push_back(labelsRow);
+	}
+
+	// Compute weighted probs
+	for (int i = 0 ; i < image.rows ; i++) {
+		std::vector<double> row;
+		for (int j = 0 ; j < image.cols ; j++) {
+			double currentProb = 0.0;
+
+			for (int k = 0 ; k < NB_GMM_CLUSTERS ; k++) {
+				currentProb += result.weights[k]*probs.at<double>(i*image.cols+j, k);
+			}
+
+			row.push_back(currentProb);
+		}
+		result.weightedProbs.push_back(row);
 	}
 
 	// Compute log likelihoods
@@ -43,9 +55,8 @@ struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT) {
 		for (int j = 0 ; j < image.cols ; j++) {
 			float saliency = saliencyLUT->at(i*image.cols+j);
 
-			row.push_back(
-				-1.0 * log(result.probs.at(i).at(j) * saliency)
-				-1.0 * log(result.weights[result.labels.at(i).at(j)]) * saliency);
+			// 1 - saliency when background (saliencyLUT is computed differently for background and foreground
+			row.push_back(-1.0 * log(result.weightedProbs.at(i).at(j) * (double)saliency));
 		}
 		result.weightedLL.push_back(row);
 	}
@@ -99,7 +110,7 @@ void postProcessingForegroundGMM(struct GMM *GMM, BoundingBox bb, int rows, int 
 			currentPixel.x = j;
 			currentPixel.y = i;
 			if (isInsideBB(currentPixel, bb)) {
-				newProbsRow.push_back(GMM->probs.at(i-minY).at(j-minX));
+				newProbsRow.push_back(GMM->weightedProbs.at(i-minY).at(j-minX));
 				newLabelsRow.push_back(GMM->labels.at(i-minY).at(j-minX));
 				newWeightedLLRow.push_back(GMM->weightedLL.at(i-minY).at(j-minX));
 			}
@@ -114,7 +125,7 @@ void postProcessingForegroundGMM(struct GMM *GMM, BoundingBox bb, int rows, int 
 		newWeightedLL.push_back(newWeightedLLRow);
 	}
 
-	GMM->probs = newProbs;
+	GMM->weightedProbs = newProbs;
 	GMM->labels = newLabels;
 	GMM->weightedLL = newWeightedLL;
 }
@@ -167,6 +178,27 @@ void convertGMMWeightedLLToCV_Mat(IplImage** result, struct GMM *GMM, int rows, 
 			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = color;
 			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = color;
 			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = color;
+		}
+	}
+
+	cvReleaseImage(result);
+	*result = cvCreateImage(cvSize(cols,rows),8,3);
+	IplImage ipltemp = tmpResult;
+	cvCopy(&ipltemp,*result);
+}
+
+void convertGMMWeightedProbsToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols) {
+	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
+
+	// Create OpenCV matrix
+	for (int i = 0 ; i < tmpResult.rows ; i++) {
+		for (int j = 0 ; j < tmpResult.cols ; j++) {
+			int color = (int)(255.0 * GMM->weightedProbs.at(i).at(j));
+
+			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = color;
+			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = color;
+			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = color;
+			
 		}
 	}
 

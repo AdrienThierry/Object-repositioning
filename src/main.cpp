@@ -24,7 +24,7 @@ typedef struct BoundingBox BoundingBox;
 int main( int argc, char** argv )
 {
 	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
-					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedLLBackground, GMMWeightedLLForeground, ExtractedForeground};
+					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedProbsBackground, GMMWeightedProbsForeground, ExtractedForeground};
 	WhatToShow currentlyShown = BaseImage;
 	bool drawCentroids = false;
 	bool showBoundingBox = true;
@@ -33,7 +33,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/beach.jpg"); // Input image
+	cv::Mat img = cv::imread("data/paques_island.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -87,8 +87,8 @@ int main( int argc, char** argv )
 	IplImage *saliencyMat = NULL;
 	IplImage *GMMLabelsBackgroundMat = NULL;
 	IplImage *GMMLabelsForegroundMat = NULL;
-	IplImage *GMMWeightedLLBackgroundMat = NULL;
-	IplImage *GMMWeightedLLForegroundMat = NULL;
+	IplImage *GMMWeightedProbsBackgroundMat = NULL;
+	IplImage *GMMWeightedProbsForegroundMat = NULL;
 	IplImage *extractedForegroundMat = NULL;
 
 	SDL_Surface *surf = NULL;
@@ -136,10 +136,10 @@ int main( int argc, char** argv )
 						currentlyShown = GMMLabelsForeground;
 						break;
 					case SDLK_KP_6:
-						currentlyShown = GMMWeightedLLBackground;
+						currentlyShown = GMMWeightedProbsBackground;
 						break;
 					case SDLK_KP_7:
-						currentlyShown = GMMWeightedLLForeground;
+						currentlyShown = GMMWeightedProbsForeground;
 						break;
 					case SDLK_KP_8:
 						currentlyShown = ExtractedForeground;
@@ -223,14 +223,14 @@ int main( int argc, char** argv )
 					convertCV_MatToSDL_Surface(&surf, GMMLabelsForegroundMat);
 				}
 				break;
-			case GMMWeightedLLBackground:
-				if (GMMWeightedLLBackgroundMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, GMMWeightedLLBackgroundMat);
+			case GMMWeightedProbsBackground:
+				if (GMMWeightedProbsBackgroundMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsBackgroundMat);
 				}
 				break;
-			case GMMWeightedLLForeground:
-				if (GMMWeightedLLForegroundMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, GMMWeightedLLForegroundMat);
+			case GMMWeightedProbsForeground:
+				if (GMMWeightedProbsForegroundMat != NULL) {
+					convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsForegroundMat);
 				}
 				break;
 			case ExtractedForeground:
@@ -275,13 +275,13 @@ int main( int argc, char** argv )
 
 			struct GMM GMMBackground = computeGMM(superpixelsMat, &saliencyBackgroundLUT);
 			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
-			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLBackgroundMat, &GMMBackground, img.rows, img.cols);
+			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsBackgroundMat, &GMMBackground, img.rows, img.cols);
 
 			IplImage foreground = preProcessingForegroundGMM(superpixelsMat, boundingBox);
 			struct GMM GMMForeground = computeGMM(&foreground, &saliencyForegroundLUT);
 			postProcessingForegroundGMM(&GMMForeground, boundingBox, img.rows, img.cols);
 			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, &GMMForeground, img.rows, img.cols);			
-			convertGMMWeightedLLToCV_Mat(&GMMWeightedLLForegroundMat, &GMMForeground, img.rows, img.cols);
+			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsForegroundMat, &GMMForeground, img.rows, img.cols);
 
 			extractForeground(	img2, 
 								&extractedForegroundMat, 
