@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <semaphore.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -20,6 +22,8 @@ using namespace std;
 typedef struct Superpixel Superpixel;
 typedef struct Point Point;
 typedef struct BoundingBox BoundingBox;
+typedef struct GMM GMM;
+typedef struct GMM_arg_struct GMM_arg_struct;
 
 int main( int argc, char** argv )
 {
@@ -30,10 +34,19 @@ int main( int argc, char** argv )
 	bool showBoundingBox = true;
 	bool boundingBoxDrawn = false;
 
+	pthread_t GMMBackgroundThread;
+	pthread_t GMMForegroundThread;
+
+	GMM_arg_struct GMM_args_foreground;
+	GMM_arg_struct GMM_args_background;
+
+	sem_t semGMMForeground; // Rendez-vous with GMMForegroundThread
+	sem_t semGMMBackground; // Rendez-vous with GMMBackgroundThread
+
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/paques_island.jpg"); // Input image
+	cv::Mat img = cv::imread("data/beach.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -93,6 +106,15 @@ int main( int argc, char** argv )
 
 	SDL_Surface *surf = NULL;
 	SDL_Texture *tex = NULL;
+
+	//--------------------------------------------------------------------------------
+	// Other pointers declarations
+	//--------------------------------------------------------------------------------
+	GMM* GMMForeground = new GMM;
+	GMM* GMMBackground = new GMM;
+
+	sem_init(&semGMMForeground, 0, 0);
+	sem_init(&semGMMBackground, 0, 0);
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
@@ -273,20 +295,35 @@ int main( int argc, char** argv )
 			std::vector<float> saliencyForegroundLUT = getSaliencyForegroundLUT(superpixels, boundingBox);
 			std::vector<float> saliencyBackgroundLUT = getSaliencyBackgroundLUT(superpixels, img.rows, img.cols);
 
-			struct GMM GMMBackground = computeGMM(superpixelsMat, &saliencyBackgroundLUT);
-			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, &GMMBackground, img.rows, img.cols);
-			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsBackgroundMat, &GMMBackground, img.rows, img.cols);
+			GMM_args_background.result = GMMBackground;
+			GMM_args_background.imageIpl = superpixelsMat;
+			GMM_args_background.saliencyLUT = &saliencyBackgroundLUT;
+			GMM_args_background.semaphore = &semGMMBackground;
 
 			IplImage foreground = preProcessingForegroundGMM(superpixelsMat, boundingBox);
-			struct GMM GMMForeground = computeGMM(&foreground, &saliencyForegroundLUT);
-			postProcessingForegroundGMM(&GMMForeground, boundingBox, img.rows, img.cols);
-			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, &GMMForeground, img.rows, img.cols);			
-			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsForegroundMat, &GMMForeground, img.rows, img.cols);
+
+			GMM_args_foreground.result = GMMForeground;
+			GMM_args_foreground.imageIpl = &foreground;
+			GMM_args_foreground.saliencyLUT = &saliencyForegroundLUT;
+			GMM_args_foreground.semaphore = &semGMMForeground;
+
+			pthread_create(&GMMBackgroundThread, NULL, &computeGMM, (void*)&GMM_args_background);
+			pthread_create(&GMMForegroundThread, NULL, &computeGMM, (void*)&GMM_args_foreground);
+
+			sem_wait(&semGMMBackground);
+			sem_wait(&semGMMForeground);
+
+			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, GMMBackground, img.rows, img.cols);
+			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsBackgroundMat, GMMBackground, img.rows, img.cols);
+
+			postProcessingForegroundGMM(GMMForeground, boundingBox, img.rows, img.cols);
+			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, GMMForeground, img.rows, img.cols);			
+			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsForegroundMat, GMMForeground, img.rows, img.cols);
 
 			extractForeground(	img2, 
 								&extractedForegroundMat, 
-								&GMMForeground,
-								&GMMBackground,
+								GMMForeground,
+								GMMBackground,
 								boundingBox,
 								img.rows,
 								img.cols );

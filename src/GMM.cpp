@@ -2,10 +2,11 @@
 #include <cmath>
 #include "GMM.hpp"
 
-struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT) {
-	struct GMM result;	
+void *computeGMM(void *args) {
+	
+	struct GMM_arg_struct *GMM_args = (struct GMM_arg_struct*)args;
 
-	cv::Mat image(imageIpl, true);
+	cv::Mat image(GMM_args->imageIpl, true);
 
 	cv::EM model(NB_GMM_CLUSTERS);
 	cv::Mat samples;
@@ -22,7 +23,7 @@ struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT) {
 	// Get GMM weights
 	for (int i = 0 ; i < NB_GMM_CLUSTERS ; i++) {
 		cv::Mat weights = model.get<cv::Mat>("weights");
-		result.weights[i] = weights.at<double>(0,i);
+		GMM_args->result->weights[i] = weights.at<double>(0,i);
 	}
 
 	// Get labels
@@ -31,7 +32,7 @@ struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT) {
 		for (int j = 0 ; j < image.cols ; j++) {
 			labelsRow.push_back((int)(labels.data[labels.step[0]*i + labels.step[1]*j]));
 		}
-		result.labels.push_back(labelsRow);
+		GMM_args->result->labels.push_back(labelsRow);
 	}
 
 	// Compute weighted probs
@@ -41,27 +42,29 @@ struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT) {
 			double currentProb = 0.0;
 
 			for (int k = 0 ; k < NB_GMM_CLUSTERS ; k++) {
-				currentProb += result.weights[k]*probs.at<double>(i*image.cols+j, k);
+				currentProb += GMM_args->result->weights[k]*probs.at<double>(i*image.cols+j, k);
 			}
 
 			row.push_back(currentProb);
 		}
-		result.weightedProbs.push_back(row);
+		GMM_args->result->weightedProbs.push_back(row);
 	}
 
 	// Compute log likelihoods
 	for (int i = 0 ; i < image.rows ; i++) {
 		std::vector<double> row;
 		for (int j = 0 ; j < image.cols ; j++) {
-			float saliency = saliencyLUT->at(i*image.cols+j);
+			float saliency = GMM_args->saliencyLUT->at(i*image.cols+j);
 
 			// 1 - saliency when background (saliencyLUT is computed differently for background and foreground
-			row.push_back(-1.0 * log(result.weightedProbs.at(i).at(j) * (double)saliency));
+			row.push_back(-1.0 * log(GMM_args->result->weightedProbs.at(i).at(j) * (double)saliency));
 		}
-		result.weightedLL.push_back(row);
+		GMM_args->result->weightedLL.push_back(row);
 	}
 
-	return result;
+	sem_post(GMM_args->semaphore);
+
+	return NULL;
 }
 
 IplImage preProcessingForegroundGMM(IplImage *image, BoundingBox bb) {

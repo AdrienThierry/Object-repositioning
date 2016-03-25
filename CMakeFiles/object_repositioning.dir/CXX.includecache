@@ -47,9 +47,13 @@ GMM.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/GMM.hpp
 opencv2/opencv.hpp
 -
+opencv2/imgproc/imgproc.hpp
+-
 opencv2/ml/ml.hpp
 -
 unistd.h
+-
+semaphore.h
 -
 vector
 -
@@ -166,6 +170,10 @@ stdio.h
 string.h
 -
 unistd.h
+-
+pthread.h
+-
+semaphore.h
 -
 opencv2/opencv.hpp
 -

@@ -2,8 +2,10 @@
 #define GMM_H_
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <unistd.h>
+#include <semaphore.h>
 #include <vector>
 
 #include "BoundingBox.hpp"
@@ -18,7 +20,14 @@ struct GMM {
 	double weights[NB_GMM_CLUSTERS]; // Weights of the GMM components
 };
 
-struct GMM computeGMM(IplImage *imageIpl, std::vector<float>* saliencyLUT);
+struct GMM_arg_struct {
+	struct GMM *result;
+	IplImage *imageIpl;
+	std::vector<float>* saliencyLUT;
+	sem_t *semaphore; // Rdv with main
+};
+
+void *computeGMM(void *args);
 
 IplImage preProcessingForegroundGMM(IplImage *image, BoundingBox bb); // Creates an image that only contains the pixels inside the bounding box
 
