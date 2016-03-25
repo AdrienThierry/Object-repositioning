@@ -16,6 +16,7 @@
 #include "foreground_extraction.hpp"
 #include "GMM.hpp"
 #include "graph.h"
+#include "PolygonalChain.hpp"
 
 using namespace std;
 
@@ -24,15 +25,17 @@ typedef struct Point Point;
 typedef struct BoundingBox BoundingBox;
 typedef struct GMM GMM;
 typedef struct GMM_arg_struct GMM_arg_struct;
+typedef struct PolygonalChain PolygonalChain;
 
 int main( int argc, char** argv )
 {
+	enum State { WaitForGround, WaitForBB, Compute, ShowResult };
 	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
-					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedProbsBackground, GMMWeightedProbsForeground, ExtractedForeground};
+					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedProbsBackground, GMMWeightedProbsForeground, ExtractedForeground };
 	WhatToShow currentlyShown = BaseImage;
+	State currentState = WaitForGround;
+	State previousState = WaitForGround;
 	bool drawCentroids = false;
-	bool showBoundingBox = true;
-	bool boundingBoxDrawn = false;
 
 	pthread_t GMMBackgroundThread;
 	pthread_t GMMForegroundThread;
@@ -42,6 +45,9 @@ int main( int argc, char** argv )
 
 	sem_t semGMMForeground; // Rendez-vous with GMMForegroundThread
 	sem_t semGMMBackground; // Rendez-vous with GMMBackgroundThread
+
+	sem_init(&semGMMForeground, 0, 0);
+	sem_init(&semGMMBackground, 0, 0);
 
 	//--------------------------------------------------------------------------------
 	// Image loading
@@ -108,13 +114,12 @@ int main( int argc, char** argv )
 	SDL_Texture *tex = NULL;
 
 	//--------------------------------------------------------------------------------
-	// Other pointers declarations
+	// Other variables declarations
 	//--------------------------------------------------------------------------------
 	GMM* GMMForeground = new GMM;
 	GMM* GMMBackground = new GMM;
 
-	sem_init(&semGMMForeground, 0, 0);
-	sem_init(&semGMMBackground, 0, 0);
+	PolygonalChain groundLine;
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
@@ -138,37 +143,39 @@ int main( int argc, char** argv )
 			// Keyboard key DOWN
 			//--------------------------------------------------------------------------------
 			if (e.type == SDL_KEYDOWN) {
-				switch(e.key.keysym.sym) {
-					case SDLK_KP_0:
-						currentlyShown = BaseImage;
-						break;
-					case SDLK_KP_1:
-						currentlyShown = Superpixels;
-						break;
-					case SDLK_KP_2:
-						currentlyShown = SuperpixelsIntersection;
-						break;
-					case SDLK_KP_3:
-						currentlyShown = Saliency;
-						break;
-					case SDLK_KP_4:
-						currentlyShown = GMMLabelsBackground;
-						break;
-					case SDLK_KP_5:
-						currentlyShown = GMMLabelsForeground;
-						break;
-					case SDLK_KP_6:
-						currentlyShown = GMMWeightedProbsBackground;
-						break;
-					case SDLK_KP_7:
-						currentlyShown = GMMWeightedProbsForeground;
-						break;
-					case SDLK_KP_8:
-						currentlyShown = ExtractedForeground;
-						break;
-					default:
-						currentlyShown = BaseImage;
-						break;
+				if (currentState == ShowResult) {
+					switch(e.key.keysym.sym) {
+						case SDLK_KP_0:
+							currentlyShown = BaseImage;
+							break;
+						case SDLK_KP_1:
+							currentlyShown = Superpixels;
+							break;
+						case SDLK_KP_2:
+							currentlyShown = SuperpixelsIntersection;
+							break;
+						case SDLK_KP_3:
+							currentlyShown = Saliency;
+							break;
+						case SDLK_KP_4:
+							currentlyShown = GMMLabelsBackground;
+							break;
+						case SDLK_KP_5:
+							currentlyShown = GMMLabelsForeground;
+							break;
+						case SDLK_KP_6:
+							currentlyShown = GMMWeightedProbsBackground;
+							break;
+						case SDLK_KP_7:
+							currentlyShown = GMMWeightedProbsForeground;
+							break;
+						case SDLK_KP_8:
+							currentlyShown = ExtractedForeground;
+							break;
+						default:
+							currentlyShown = BaseImage;
+							break;
+					}
 				}
 			}
 
@@ -176,12 +183,21 @@ int main( int argc, char** argv )
 			// Mouse button DOWN
 			//--------------------------------------------------------------------------------
 			if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
-				clicking = true;
-				clickCoord.x = e.motion.x;
-				clickCoord.y = e.motion.y;
-				for (int i = 0 ; i < 4 ; i++) {
-					boundingBox.points[i].x = 0;
-					boundingBox.points[i].y = 0;
+				if (currentState == WaitForGround) {
+					groundLine.y = e.motion.y;
+
+					currentState = WaitForBB;
+					previousState = WaitForGround;
+				}
+
+				else if (currentState == WaitForBB) {
+					clicking = true;
+					clickCoord.x = e.motion.x;
+					clickCoord.y = e.motion.y;
+					for (int i = 0 ; i < 4 ; i++) {
+						boundingBox.points[i].x = 0;
+						boundingBox.points[i].y = 0;
+					}
 				}
 			}
 			
@@ -189,80 +205,90 @@ int main( int argc, char** argv )
 			// Mouse button UP
 			//--------------------------------------------------------------------------------
 			if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
-				clicking = false;
+				if (currentState == WaitForBB && previousState != WaitForGround) {
+					clicking = false;
 
-				boundingBoxDrawn = true;
+					currentState = Compute;
+				}
 			}
 
 			//--------------------------------------------------------------------------------
 			// Mouse MOVING
 			//--------------------------------------------------------------------------------
 			if (clicking == true && e.type == SDL_MOUSEMOTION) {
-				mousePosition.x = e.motion.x;
-				mousePosition.y = e.motion.y;
+				if (currentState == WaitForBB) {
+					mousePosition.x = e.motion.x;
+					mousePosition.y = e.motion.y;
 
-				boundingBox.points[0].x = clickCoord.x;
-				boundingBox.points[0].y = clickCoord.y;
-				boundingBox.points[1].x = mousePosition.x;
-				boundingBox.points[1].y = clickCoord.y;
-				boundingBox.points[2].x = mousePosition.x;
-				boundingBox.points[2].y = mousePosition.y;
-				boundingBox.points[3].x = clickCoord.x;
-				boundingBox.points[3].y = mousePosition.y;
+					boundingBox.points[0].x = clickCoord.x;
+					boundingBox.points[0].y = clickCoord.y;
+					boundingBox.points[1].x = mousePosition.x;
+					boundingBox.points[1].y = clickCoord.y;
+					boundingBox.points[2].x = mousePosition.x;
+					boundingBox.points[2].y = mousePosition.y;
+					boundingBox.points[3].x = clickCoord.x;
+					boundingBox.points[3].y = mousePosition.y;
+				}
 			}
 		}
 
 		// Clear renderer
 		SDL_RenderClear(ren);
 
-		// Load image to show in SDL_Surface and texture
-		switch(currentlyShown) {
-			case BaseImage:
-				convertCV_MatToSDL_Surface(&surf, img2);
-				break;
-			case Superpixels:
-				if (superpixelsMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, superpixelsMat);
-				}
-				break;
-			case SuperpixelsIntersection:
-				if (superpixelsIntersectionMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, superpixelsIntersectionMat);
-				}
-				break;
-			case Saliency:
-				if (saliencyMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, saliencyMat);
-				}
-				break;
-			case GMMLabelsBackground:
-				if (GMMLabelsBackgroundMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, GMMLabelsBackgroundMat);
-				}
-				break;
-			case GMMLabelsForeground:
-				if (GMMLabelsForegroundMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, GMMLabelsForegroundMat);
-				}
-				break;
-			case GMMWeightedProbsBackground:
-				if (GMMWeightedProbsBackgroundMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsBackgroundMat);
-				}
-				break;
-			case GMMWeightedProbsForeground:
-				if (GMMWeightedProbsForegroundMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsForegroundMat);
-				}
-				break;
-			case ExtractedForeground:
-				if (extractedForegroundMat != NULL) {
-					convertCV_MatToSDL_Surface(&surf, extractedForegroundMat);
-				}
-				break;
-			default:
-				convertCV_MatToSDL_Surface(&surf, img2);
-				break;
+
+		if (currentState == WaitForGround || currentState == WaitForBB || currentState == Compute) {
+			convertCV_MatToSDL_Surface(&surf, img2);
+		}
+		if (currentState == ShowResult) {
+			// Load image to show in SDL_Surface and texture
+			switch(currentlyShown) {
+				case BaseImage:
+					convertCV_MatToSDL_Surface(&surf, img2);
+					break;
+				case Superpixels:
+					if (superpixelsMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, superpixelsMat);
+					}
+					break;
+				case SuperpixelsIntersection:
+					if (superpixelsIntersectionMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, superpixelsIntersectionMat);
+					}
+					break;
+				case Saliency:
+					if (saliencyMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, saliencyMat);
+					}
+					break;
+				case GMMLabelsBackground:
+					if (GMMLabelsBackgroundMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, GMMLabelsBackgroundMat);
+					}
+					break;
+				case GMMLabelsForeground:
+					if (GMMLabelsForegroundMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, GMMLabelsForegroundMat);
+					}
+					break;
+				case GMMWeightedProbsBackground:
+					if (GMMWeightedProbsBackgroundMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsBackgroundMat);
+					}
+					break;
+				case GMMWeightedProbsForeground:
+					if (GMMWeightedProbsForegroundMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsForegroundMat);
+					}
+					break;
+				case ExtractedForeground:
+					if (extractedForegroundMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, extractedForegroundMat);
+					}
+					break;
+				default:
+					convertCV_MatToSDL_Surface(&surf, img2);
+					break;
+			}
 		}
 		SDL_DestroyTexture(tex);
 		tex = SDL_CreateTextureFromSurface(ren, surf);
@@ -270,8 +296,14 @@ int main( int argc, char** argv )
 		// Draw image
 		SDL_RenderCopy(ren, tex, NULL, NULL);
 
+		// Draw ground line
+		if (currentState == WaitForGround || currentState == WaitForBB || currentState == Compute) {
+			SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
+			SDL_RenderDrawLine(ren, 0, groundLine.y, img.cols, groundLine.y);
+		}
+
 		// Draw bounding box
-		if (showBoundingBox) {
+		if (currentState == WaitForBB || currentState == Compute) {
 			SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
 			for (int i = 0 ; i < 4 ; i++) {
 				SDL_RenderDrawLine(ren,boundingBox.points[i].x, boundingBox.points[i].y, boundingBox.points[(i+1)%4].x, boundingBox.points[(i+1)%4].y);
@@ -285,7 +317,7 @@ int main( int argc, char** argv )
 
 		SDL_RenderPresent(ren);
 
-		if (boundingBoxDrawn) {
+		if (currentState == Compute) {
 			computeSuperpixelIntersectionWithBB(superpixels, boundingBox);
 			convertSuperpixelsIntersectionToCV_Mat(&superpixelsIntersectionMat, superpixels, img.rows, img.cols);
 
@@ -330,8 +362,10 @@ int main( int argc, char** argv )
 
 			currentlyShown = ExtractedForeground;
 
-			boundingBoxDrawn = false;
+			currentState = ShowResult;
 		}
+
+		previousState = currentState;
 	}
 
 	SDL_DestroyRenderer(ren);

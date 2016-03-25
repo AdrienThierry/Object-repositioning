@@ -46,6 +46,7 @@ CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Color.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/GMM.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/MeanShift.h
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Point.hpp
+CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/PolygonalChain.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/Superpixel.hpp
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/block.h
 CMakeFiles/object_repositioning.dir/src/main.cpp.o: src/foreground_extraction.hpp
