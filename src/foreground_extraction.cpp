@@ -95,9 +95,11 @@ void assignSmoothnessTerm(GraphType *g, IplImage *image, int rows, int cols) {
 	}
 }
 
-void extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols) {
+struct Foreground extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols) {
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
 	cv::Mat inputMat(input, true);
+
+	struct Foreground foregroundResult;
 
 	// Create graph
 	GraphType *g = createGraph(rows, cols);
@@ -109,17 +111,26 @@ void extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForegr
 	// Perform graph cut
 	g -> maxflow();
 
-	// Create resulting image
+	// Create resulting image and foreground mask
 	for (int i = 0 ; i < rows ; i++) {
+		std::vector<bool> row;
 		for (int j = 0 ; j < cols ; j++) {
-			if (g->what_segment(i*cols+j) == GraphType::SOURCE) { // Foreground
+			
+			// If foreground
+			if (g->what_segment(i*cols+j) == GraphType::SOURCE) {
 				tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = inputMat.data[inputMat.step[0]*i + inputMat.step[1]*j + 0];
 				tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = inputMat.data[inputMat.step[0]*i + inputMat.step[1]*j + 1];
 				tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = inputMat.data[inputMat.step[0]*i + inputMat.step[1]*j + 2];
+
+				row.push_back(true);
 			}
 
-			// If background, pixel is black => Do nothing
+			// If background
+			else {
+				row.push_back(false);			
+			}
 		}
+		foregroundResult.mask.push_back(row);
 	}
 
 	cvReleaseImage(result);
@@ -128,6 +139,136 @@ void extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForegr
 	cvCopy(&ipltemp,*result);
 
 	freeGraph(g);
+
+	return foregroundResult;
+}
+
+void computeForegroundBB(struct Foreground *foreground) {
+	unsigned int Xmax = 0, Ymax = 0;
+	unsigned int Xmin = foreground->mask.at(0).size();
+	unsigned int Ymin = foreground->mask.size();
+
+	// Compute bounding box that fits foreground mask the most
+	for (unsigned int i = 0 ; i < foreground->mask.size() ; i++) {
+		for (unsigned int j = 0 ; j < foreground->mask.at(0).size() ; j++) {
+			if (foreground->mask.at(i).at(j) == true) {
+				if (j > Xmax)
+					Xmax = j;
+				if (j < Xmin)
+					Xmin = j;
+				if (i > Ymax)
+					Ymax = i;
+				if (i < Ymin)
+					Ymin = i;
+			}
+		}
+	}
+
+	Point p1, p2, p3, p4;
+	p1.x = Xmin;
+	p1.y = Ymin;
+	p2.x = Xmax;
+	p2.y = Ymin;
+	p3.x = Xmax;
+	p3.y = Ymax;
+	p4.x = Xmin;
+	p4.y = Ymax;
+
+	foreground->bb.points[0] = p1;
+	foreground->bb.points[1] = p2;
+	foreground->bb.points[2] = p3;
+	foreground->bb.points[3] = p4;
+
+	foreground->bb.ends[0] = Xmin;
+	foreground->bb.ends[1] = Xmax;
+	foreground->bb.ends[2] = Ymin;
+	foreground->bb.ends[3] = Ymax;
+}
+
+void computeForegroundImage(IplImage *input, IplImage **result, struct Foreground *foreground) {
+	int xMin = foreground->bb.ends[0];
+	int xMax = foreground->bb.ends[1];
+	int yMin = foreground->bb.ends[2];
+	int yMax = foreground->bb.ends[3];
+
+	int rows = yMax - yMin;
+	int cols = xMax - xMin;
+
+	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC4);
+	cv::Mat inputMat(input, true);
+
+	for (int i = yMin ; i < yMax ; i++) {
+		for (int j = xMin ; j < xMax ; j++) {
+			if (foreground->mask.at(i).at(j) == true) {
+
+				tmpResult.data[tmpResult.step[0]*(i-yMin) + tmpResult.step[1]*(j-xMin) + 0] = 
+					inputMat.data[inputMat.step[0]*i + inputMat.step[1]*j + 0];
+
+				tmpResult.data[tmpResult.step[0]*(i-yMin) + tmpResult.step[1]*(j-xMin) + 1] = 
+					inputMat.data[inputMat.step[0]*i + inputMat.step[1]*j + 1];
+
+				tmpResult.data[tmpResult.step[0]*(i-yMin) + tmpResult.step[1]*(j-xMin) + 2] = 
+					inputMat.data[inputMat.step[0]*i + inputMat.step[1]*j + 2];
+
+				tmpResult.data[tmpResult.step[0]*(i-yMin) + tmpResult.step[1]*(j-xMin) + 3] = 255; // Opaque
+			}
+
+			else {
+				tmpResult.data[tmpResult.step[0]*(i-yMin) + tmpResult.step[1]*(j-xMin) + 3] = 0; // Opaque
+			}
+		}
+	}
+
+	cvReleaseImage(result);
+	*result = cvCreateImage(cvSize(cols,rows),8,4);
+	IplImage ipltemp = tmpResult;
+	cvCopy(&ipltemp,*result);
+
+}
+
+void convertForegroundMaskToCV_Mat(IplImage** result, struct Foreground *foreground, int rows, int cols) {
+	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
+	
+	// Create OpenCV matrix
+	for (int i = 0 ; i < tmpResult.rows ; i++) {
+		for (int j = 0 ; j < tmpResult.cols ; j++) {
+			int color = 255 * (int)foreground->mask.at(i).at(j);
+
+			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = color;
+			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = color;
+			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = color;
+			
+		}
+	}
+
+	// Draw bounding box
+	int xMin = foreground->bb.ends[0];
+	int xMax = foreground->bb.ends[1];
+	int yMin = foreground->bb.ends[2];
+	int yMax = foreground->bb.ends[3];
+	for (int i = yMin ; i < yMax ; i++) {
+		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMin + 0] = 0;
+		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMin + 1] = 255;
+		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMin + 2] = 0;
+
+		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMax + 0] = 0;
+		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMax + 1] = 255;
+		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMax + 2] = 0;
+	}
+	for (int i = xMin ; i < xMax ; i++) {
+		tmpResult.data[tmpResult.step[0]*yMin + tmpResult.step[1]*i + 0] = 0;
+		tmpResult.data[tmpResult.step[0]*yMin + tmpResult.step[1]*i + 1] = 255;
+		tmpResult.data[tmpResult.step[0]*yMin + tmpResult.step[1]*i + 2] = 0;
+
+		tmpResult.data[tmpResult.step[0]*yMax + tmpResult.step[1]*i + 0] = 0;
+		tmpResult.data[tmpResult.step[0]*yMax + tmpResult.step[1]*i + 1] = 255;
+		tmpResult.data[tmpResult.step[0]*yMax + tmpResult.step[1]*i + 2] = 0;
+	}
+
+	cvReleaseImage(result);
+	*result = cvCreateImage(cvSize(cols,rows),8,3);
+	IplImage ipltemp = tmpResult;
+	cvCopy(&ipltemp,*result);
 }
 
 void freeGraph(GraphType *g) {

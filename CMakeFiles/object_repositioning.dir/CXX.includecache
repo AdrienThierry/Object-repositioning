@@ -177,6 +177,8 @@ pthread.h
 -
 semaphore.h
 -
+cmath
+-
 opencv2/opencv.hpp
 -
 opencv2/imgproc/imgproc.hpp
