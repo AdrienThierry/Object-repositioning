@@ -9,6 +9,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/object_repositioning.dir/src/GMM.cpp.o"
   "CMakeFiles/object_repositioning.dir/src/graph.cpp.o"
   "CMakeFiles/object_repositioning.dir/src/maxflow.cpp.o"
+  "CMakeFiles/object_repositioning.dir/src/Depth.cpp.o"
   "object_repositioning.pdb"
   "object_repositioning"
 )

@@ -18,6 +18,7 @@
 #include "GMM.hpp"
 #include "graph.h"
 #include "PolygonalChain.hpp"
+#include "Depth.hpp"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ int main( int argc, char** argv )
 	enum State { WaitForGround, WaitForBB, Compute, ShowResult };
 	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
 					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedProbsBackground, GMMWeightedProbsForeground, 
-					ExtractedForeground, ForegroundMask };
+					ExtractedForeground, ForegroundMask, DepthMap };
 	WhatToShow currentlyShown = BaseImage;
 	State currentState = WaitForGround;
 	bool drawCentroids = false;
@@ -53,7 +54,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/path.jpg"); // Input image
+	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -112,6 +113,7 @@ int main( int argc, char** argv )
 	IplImage *extractedForegroundMat = NULL;
 	IplImage *foregroundMaskMat = NULL;
 	IplImage *foregroundMat = NULL;
+	IplImage *depthMat = NULL;
 
 	SDL_Surface *surf = NULL; // Whole image
 	SDL_Surface *foregroundSurf = NULL; // Movable foreground
@@ -133,11 +135,14 @@ int main( int argc, char** argv )
 	float ratio; // Foreground aspect ratio
 	int originalHeight;
 	int originalBottom;
+	BoundingBox originalForegroundBB;
 
 	bool clicking = false;
 	bool movingForeground = false;
 
 	BoundingBox boundingBox;
+
+	vector<vector<float> > depthMap;
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
@@ -190,6 +195,9 @@ int main( int argc, char** argv )
 							break;
 						case SDLK_KP_9:
 							currentlyShown = ForegroundMask;
+							break;
+						case SDLK_d:
+							currentlyShown = DepthMap;
 							break;
 						default:
 							currentlyShown = BaseImage;
@@ -245,6 +253,11 @@ int main( int argc, char** argv )
 
 				else if (currentState == ShowResult) {
 					movingForeground = false;
+
+					// Compute depth map
+					//depthMap = computeDepthMap(&groundLine, &foregroundPosition, &foregroundStruct, &originalForegroundBB, img.rows, img.cols);
+					// Convert depth map to cv::mat
+					//convertDepthToCV_Mat(&depthMat, &depthMap);
 				}
 			}
 
@@ -268,7 +281,8 @@ int main( int argc, char** argv )
 
 				else if (currentState == ShowResult && movingForeground) {
 					delta.x = mousePosition.x - previousPosition.x;
-					delta.y = mousePosition.y - previousPosition.y;
+					//delta.y = mousePosition.y - previousPosition.y;
+					delta.y = previousPosition.y - mousePosition.y;
 
 					// Move X
 					foregroundPosition.x += delta.x;
@@ -374,6 +388,11 @@ int main( int argc, char** argv )
 						convertCV_MatToSDL_Surface(&surf, foregroundMaskMat);
 					}
 					break;
+				case DepthMap:
+					if (depthMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, depthMat);
+					}
+					break;
 				default:
 					convertCV_MatToSDL_Surface(&surf, img2);
 					break;
@@ -389,7 +408,7 @@ int main( int argc, char** argv )
 
 		// Draw image
 		SDL_RenderCopy(ren, tex, NULL, NULL);
-		if (foregroundTex != NULL) {
+		if (foregroundTex != NULL && currentlyShown == BaseImage) {
 			SDL_RenderCopy(ren, foregroundTex, NULL, &foregroundPosition);
 		}
 
@@ -481,6 +500,8 @@ int main( int argc, char** argv )
 			foregroundPosition.y = foregroundStruct.bb.ends[2];
 			foregroundPosition.h = foregroundStruct.bb.ends[3] - foregroundStruct.bb.ends[2];
 			foregroundPosition.w = foregroundStruct.bb.ends[1] - foregroundStruct.bb.ends[0];
+
+			originalForegroundBB = foregroundStruct.bb;
 
 			ratio = (float)foregroundPosition.w / (float)foregroundPosition.h;
 			originalHeight = foregroundPosition.h;

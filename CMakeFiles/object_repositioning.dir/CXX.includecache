@@ -36,6 +36,22 @@ Color.hpp
 
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Color.hpp
 
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Depth.cpp
+Depth.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Depth.hpp
+
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Depth.hpp
+unistd.h
+-
+Superpixel.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Superpixel.hpp
+BoundingBox.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.hpp
+PolygonalChain.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/PolygonalChain.hpp
+foreground_extraction.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/foreground_extraction.hpp
+
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/GMM.cpp
 stdio.h
 -
@@ -205,6 +221,8 @@ graph.h
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/graph.h
 PolygonalChain.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/PolygonalChain.hpp
+Depth.hpp
+/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/Depth.hpp
 
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/maxflow.cpp
 stdio.h
