@@ -91,16 +91,16 @@ float distanceSuperpixelBB(struct Superpixel *superpixel, BoundingBox bb, int ro
 			maxY = bb.points[i].y;
 	}
 
-	// Warning : distance has to be normalized (see article)
+	// Distance has to be normalized (see article)
 	float distance = (float)superpixel->center.x - minX;
 	if (maxX - superpixel->center.x < distance)
-		distance = (maxX - superpixel->center.x) / (float)cols;
+		distance = (maxX - superpixel->center.x) / ((float)cols / 2.0);
 	else if (superpixel->center.y - minY < distance)
-		distance = (superpixel->center.y = minY) / (float)rows;
+		distance = (superpixel->center.y = minY) / ((float)rows / 2.0);
 	else if (maxY - superpixel->center.y < distance)
-		distance = (maxY - superpixel->center.y) / (float)rows;
+		distance = (maxY - superpixel->center.y) / ((float)rows / 2.0);
 	else
-		distance /= (float)cols;
+		distance /= ((float)cols / 2.0);
 
 	return distance;
 }
@@ -150,7 +150,7 @@ void computeSaliencyMap(std::vector<struct Superpixel>* superpixels, struct Boun
 				float toAdd = 0;
 				toAdd = exp(-1.0 * distanceSuperpixels(&superpixels->at(i), crossingSP.at(j), rows, cols)/(0.5*0.5));
 				toAdd *= (1.0 - exp(-1.0 * distanceSuperpixelBB(&superpixels->at(i), bb, rows, cols) / (0.5*0.5)));
-				toAdd *= ((float)crossingSP.at(j)->pixels.size() / nbOfPixelsInCrossingSP);
+				toAdd *= ((float)crossingSP.at(j)->pixels.size() / (float)nbOfPixelsInCrossingSP);
 
 				struct ColorLab colorI = convertRGB2Lab(superpixels->at(i).color);
 				struct ColorLab colorJ = convertRGB2Lab(crossingSP.at(j)->color);

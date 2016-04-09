@@ -214,7 +214,7 @@ void computeForegroundImage(IplImage *input, IplImage **result, struct Foregroun
 			}
 
 			else {
-				tmpResult.data[tmpResult.step[0]*(i-yMin) + tmpResult.step[1]*(j-xMin) + 3] = 0; // Opaque
+				tmpResult.data[tmpResult.step[0]*(i-yMin) + tmpResult.step[1]*(j-xMin) + 3] = 0; // Transparent
 			}
 		}
 	}
@@ -267,6 +267,39 @@ void convertForegroundMaskToCV_Mat(IplImage** result, struct Foreground *foregro
 
 	cvReleaseImage(result);
 	*result = cvCreateImage(cvSize(cols,rows),8,3);
+	IplImage ipltemp = tmpResult;
+	cvCopy(&ipltemp,*result);
+}
+
+void updateExtractedForegroundMat(IplImage** result, IplImage *foregroundMat, SDL_Rect *foregroundPosition, int rows, int cols) {
+	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC4);
+
+	cv::Mat foreground(foregroundMat, true);
+
+	// Create OpenCV matrix
+	for (int i = 0 ; i < tmpResult.rows ; i++) {
+		for (int j = 0 ; j < tmpResult.cols ; j++) {
+			if (j > foregroundPosition->x && j < foregroundPosition->x + foregroundPosition->w &&
+				i > foregroundPosition->y && i < foregroundPosition->y + foregroundPosition->h) {
+
+				tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = 
+					foreground.data[foreground.step[0]*(i-foregroundPosition->y) + foreground.step[1]*(j-foregroundPosition->x) + 0];
+	 
+				tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = 
+					foreground.data[foreground.step[0]*(i-foregroundPosition->y) + foreground.step[1]*(j-foregroundPosition->x) + 1];
+
+				tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = 
+					foreground.data[foreground.step[0]*(i-foregroundPosition->y) + foreground.step[1]*(j-foregroundPosition->x) + 2];
+
+				tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 3] = 
+					foreground.data[foreground.step[0]*(i-foregroundPosition->y) + foreground.step[1]*(j-foregroundPosition->x) + 3];
+
+			}
+		}
+	}
+
+	cvReleaseImage(result);
+	*result = cvCreateImage(cvSize(cols,rows),8,4);
 	IplImage ipltemp = tmpResult;
 	cvCopy(&ipltemp,*result);
 }

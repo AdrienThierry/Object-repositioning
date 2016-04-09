@@ -33,6 +33,8 @@ void computeForegroundBB(struct Foreground *foreground);
 void computeForegroundImage(IplImage *input, IplImage **result, struct Foreground *foreground);
 void convertForegroundMaskToCV_Mat(IplImage** result, struct Foreground *foreground, int rows, int cols);
 
+void updateExtractedForegroundMat(IplImage** result, IplImage *foregroundMat, SDL_Rect *foregroundPosition, int rows, int cols);
+
 void freeGraph(GraphType *g);
 
 #endif

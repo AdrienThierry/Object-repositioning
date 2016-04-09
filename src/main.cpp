@@ -33,15 +33,17 @@ int main( int argc, char** argv )
 {
 	enum State { WaitForGround, WaitForBB, Compute, ShowResult };
 	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
-					GMMLabelsBackground, GMMLabelsForeground, GMMWeightedProbsBackground, GMMWeightedProbsForeground, 
-					ExtractedForeground, ForegroundMask, DepthMap };
+					GMMWeightedProbsBackground, GMMWeightedProbsForeground, 
+					ExtractedForeground };
 	WhatToShow currentlyShown = BaseImage;
 	State currentState = WaitForGround;
 	bool drawCentroids = false;
 
+	// Threads to compute GMMs
 	pthread_t GMMBackgroundThread;
 	pthread_t GMMForegroundThread;
 
+	// Args for GMMBackgroundThread and GMMForegroundThread
 	GMM_arg_struct GMM_args_foreground;
 	GMM_arg_struct GMM_args_background;
 
@@ -106,14 +108,12 @@ int main( int argc, char** argv )
 
 	IplImage *superpixelsIntersectionMat = NULL;
 	IplImage *saliencyMat = NULL;
-	IplImage *GMMLabelsBackgroundMat = NULL;
-	IplImage *GMMLabelsForegroundMat = NULL;
 	IplImage *GMMWeightedProbsBackgroundMat = NULL;
 	IplImage *GMMWeightedProbsForegroundMat = NULL;
 	IplImage *extractedForegroundMat = NULL;
-	IplImage *foregroundMaskMat = NULL;
 	IplImage *foregroundMat = NULL;
-	IplImage *depthMat = NULL;
+	IplImage *foregroundMatScaled = NULL;
+	IplImage *foregroundWithDepthMat = NULL;
 
 	SDL_Surface *surf = NULL; // Whole image
 	SDL_Surface *foregroundSurf = NULL; // Movable foreground
@@ -140,9 +140,12 @@ int main( int argc, char** argv )
 	bool clicking = false;
 	bool movingForeground = false;
 
-	BoundingBox boundingBox;
+	BoundingBox boundingBox; // Bounding box drawn by the user
 
-	vector<vector<float> > depthMap;
+	vector<vector<float> > foregroundDepthMap;
+	vector<vector<float> > backgroundDepthMap;
+
+	int counter = 0; // Counter to prevent computing depth too often
 
 	//--------------------------------------------------------------------------------
 	// SDL main loop and bounding box handling
@@ -179,25 +182,13 @@ int main( int argc, char** argv )
 							currentlyShown = Saliency;
 							break;
 						case SDLK_KP_4:
-							currentlyShown = GMMLabelsBackground;
-							break;
-						case SDLK_KP_5:
-							currentlyShown = GMMLabelsForeground;
-							break;
-						case SDLK_KP_6:
 							currentlyShown = GMMWeightedProbsBackground;
 							break;
-						case SDLK_KP_7:
+						case SDLK_KP_5:
 							currentlyShown = GMMWeightedProbsForeground;
 							break;
-						case SDLK_KP_8:
+						case SDLK_KP_6:
 							currentlyShown = ExtractedForeground;
-							break;
-						case SDLK_KP_9:
-							currentlyShown = ForegroundMask;
-							break;
-						case SDLK_d:
-							currentlyShown = DepthMap;
 							break;
 						default:
 							currentlyShown = BaseImage;
@@ -253,11 +244,6 @@ int main( int argc, char** argv )
 
 				else if (currentState == ShowResult) {
 					movingForeground = false;
-
-					// Compute depth map
-					//depthMap = computeDepthMap(&groundLine, &foregroundPosition, &foregroundStruct, &originalForegroundBB, img.rows, img.cols);
-					// Convert depth map to cv::mat
-					//convertDepthToCV_Mat(&depthMat, &depthMap);
 				}
 			}
 
@@ -280,8 +266,9 @@ int main( int argc, char** argv )
 				}
 
 				else if (currentState == ShowResult && movingForeground) {
+					counter = (counter + 1) % 10;
+
 					delta.x = mousePosition.x - previousPosition.x;
-					//delta.y = mousePosition.y - previousPosition.y;
 					delta.y = previousPosition.y - mousePosition.y;
 
 					// Move X
@@ -321,6 +308,24 @@ int main( int argc, char** argv )
 					foregroundStruct.bb.points[2] = p3;
 					foregroundStruct.bb.points[3] = p4;
 					computeBBEnds(&(foregroundStruct.bb));
+
+					if (counter == 9) {
+
+						// Scale foreground IplImage according to new dimensions
+						if (foregroundMatScaled != NULL)
+							cvReleaseImage(&foregroundMatScaled);
+						foregroundMatScaled = cvCreateImage(cvSize(foregroundPosition.w, foregroundPosition.h), foregroundMat->depth, foregroundMat->nChannels);
+						cvResize(foregroundMat, foregroundMatScaled);
+						updateExtractedForegroundMat(&extractedForegroundMat, foregroundMatScaled, &foregroundPosition, img.rows, img.cols);
+
+						// Compute depth map
+						foregroundDepthMap = computeDepthMap(&groundLine, &foregroundPosition, extractedForegroundMat, img.rows, img.cols);
+
+						// Compute final image
+						computeFinalImage(&backgroundDepthMap, &foregroundDepthMap, &foregroundWithDepthMat, extractedForegroundMat, img2, img.rows, img.cols);
+
+					}
+					
 				}
 
 				previousPosition = mousePosition;
@@ -340,7 +345,7 @@ int main( int argc, char** argv )
 				case BaseImage:
 					convertCV_MatToSDL_Surface(&surf, img2);
 					if (foregroundMat != NULL) {
-						convertCV_Mat_WithAlpha_ToSDL_Surface(&foregroundSurf, foregroundMat);
+						convertCV_Mat_WithAlpha_ToSDL_Surface(&foregroundSurf, foregroundWithDepthMat);
 					}
 					break;
 				case Superpixels:
@@ -358,16 +363,6 @@ int main( int argc, char** argv )
 						convertCV_MatToSDL_Surface(&surf, saliencyMat);
 					}
 					break;
-				case GMMLabelsBackground:
-					if (GMMLabelsBackgroundMat != NULL) {
-						convertCV_MatToSDL_Surface(&surf, GMMLabelsBackgroundMat);
-					}
-					break;
-				case GMMLabelsForeground:
-					if (GMMLabelsForegroundMat != NULL) {
-						convertCV_MatToSDL_Surface(&surf, GMMLabelsForegroundMat);
-					}
-					break;
 				case GMMWeightedProbsBackground:
 					if (GMMWeightedProbsBackgroundMat != NULL) {
 						convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsBackgroundMat);
@@ -381,16 +376,6 @@ int main( int argc, char** argv )
 				case ExtractedForeground:
 					if (extractedForegroundMat != NULL) {
 						convertCV_MatToSDL_Surface(&surf, extractedForegroundMat);
-					}
-					break;
-				case ForegroundMask:
-					if (foregroundMaskMat != NULL) {
-						convertCV_MatToSDL_Surface(&surf, foregroundMaskMat);
-					}
-					break;
-				case DepthMap:
-					if (depthMat != NULL) {
-						convertCV_MatToSDL_Surface(&surf, depthMat);
 					}
 					break;
 				default:
@@ -409,7 +394,7 @@ int main( int argc, char** argv )
 		// Draw image
 		SDL_RenderCopy(ren, tex, NULL, NULL);
 		if (foregroundTex != NULL && currentlyShown == BaseImage) {
-			SDL_RenderCopy(ren, foregroundTex, NULL, &foregroundPosition);
+			SDL_RenderCopy(ren, foregroundTex, NULL, NULL);
 		}
 
 		// Draw ground line
@@ -419,7 +404,7 @@ int main( int argc, char** argv )
 		}
 
 		// Draw bounding box
-		if (currentState == WaitForBB || currentState == Compute) {
+		if (currentState == WaitForBB || currentState == Compute || (currentState == ShowResult && (currentlyShown == SuperpixelsIntersection || currentlyShown == Saliency))) {
 			SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
 			for (int i = 0 ; i < 4 ; i++) {
 				SDL_RenderDrawLine(ren,boundingBox.points[i].x, boundingBox.points[i].y, boundingBox.points[(i+1)%4].x, boundingBox.points[(i+1)%4].y);
@@ -471,12 +456,10 @@ int main( int argc, char** argv )
 			sem_wait(&semGMMForeground);
 
 			// Create OpenCV matrices to see background GMM result
-			convertGMMLabelsToCV_Mat(&GMMLabelsBackgroundMat, GMMBackground, img.rows, img.cols);
 			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsBackgroundMat, GMMBackground, img.rows, img.cols);
 
 			// Create OpenCV matrices to see foreground GMM result
-			postProcessingForegroundGMM(GMMForeground, boundingBox, img.rows, img.cols);
-			convertGMMLabelsToCV_Mat(&GMMLabelsForegroundMat, GMMForeground, img.rows, img.cols);			
+			postProcessingForegroundGMM(GMMForeground, boundingBox, img.rows, img.cols);			
 			convertGMMWeightedProbsToCV_Mat(&GMMWeightedProbsForegroundMat, GMMForeground, img.rows, img.cols);
 
 			// Graph cut to extract foreground
@@ -492,8 +475,6 @@ int main( int argc, char** argv )
 			// Compute movable foreground image
 			computeForegroundBB(&foregroundStruct);
 			computeForegroundImage(img2, &foregroundMat, &foregroundStruct);	
- 
-			convertForegroundMaskToCV_Mat(&foregroundMaskMat, &foregroundStruct, img.rows, img.cols);
 
 			// Initial foreground position
 			foregroundPosition.x = foregroundStruct.bb.ends[0];
@@ -506,6 +487,12 @@ int main( int argc, char** argv )
 			ratio = (float)foregroundPosition.w / (float)foregroundPosition.h;
 			originalHeight = foregroundPosition.h;
 			originalBottom = foregroundPosition.y + originalHeight;
+
+			// Background depth map
+			backgroundDepthMap = computeDepthMap(&groundLine, &foregroundPosition, extractedForegroundMat, img.rows, img.cols);
+
+			foregroundDepthMap = computeDepthMap(&groundLine, &foregroundPosition, extractedForegroundMat, img.rows, img.cols);
+			computeFinalImage(&backgroundDepthMap, &foregroundDepthMap, &foregroundWithDepthMat, extractedForegroundMat, img2, img.rows, img.cols);
 
 			currentlyShown = ExtractedForeground;
 
