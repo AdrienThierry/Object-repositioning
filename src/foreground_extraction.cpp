@@ -24,26 +24,34 @@ void assignDataTerm(GraphType *g, struct GMM* GMMForeground, struct GMM* GMMBack
 			// Possibly foreground
 			if (isInsideBB(currentPixel, bb)) {
 				// It's normal that background and foreground are inverted (see https://www.youtube.com/watch?v=lYQQ88nzxAM)
-				foregroundWeight = GMMBackground->weightedLL.at(i).at(j);
-				backgroundWeight = GMMForeground->weightedLL.at(i).at(j);
+				foregroundWeight = std::max(GMMBackground->weightedLL.at(i).at(j), MAX_DATA_TERM);
+				backgroundWeight = std::max(GMMForeground->weightedLL.at(i).at(j), MAX_DATA_TERM);
+
+				//foregroundWeight = GMMBackground->weightedLL.at(i).at(j);
+				//backgroundWeight = GMMForeground->weightedLL.at(i).at(j);
 			}
 			// Outside bounding box => positively background
 			else {
 				foregroundWeight = 0.0;
-				backgroundWeight = std::numeric_limits<double>::max();
+				backgroundWeight = MAX_DATA_TERM;
 			}
 			g -> add_tweights( i*cols+j,   /* capacities */  foregroundWeight, backgroundWeight );
 		}
 	}
 }
 
-void assignSmoothnessTerm(GraphType *g, IplImage *image, int rows, int cols) {
+void assignSmoothnessTerm(IplImage** leftRightImage, IplImage** topBottomImage, GraphType *g, IplImage *image, int rows, int cols) {
 	cv::Mat imageMat(image, true);
 	
+	std::vector<std::vector<float> > leftRightWeights;
+	std::vector<std::vector<float> > topBottomWeights;
+
 	// Left-right weights
 	for (int i = 0 ; i < rows ; i++) {
+		std::vector<float> row;
+
 		for (int j = 0 ; j < cols-1 ; j++) {
-			
+
 			float weight = 0.0;
 			struct Color color1, color2;
 			struct ColorLab color1Lab, color2Lab;
@@ -64,13 +72,20 @@ void assignSmoothnessTerm(GraphType *g, IplImage *image, int rows, int cols) {
 			weight = LAMBDA * exp(-1.0 * dist * dist / (2.0 * (float)SIGMA * (float)SIGMA));
 
 			g -> add_edge( i*cols+j, i*cols+(j+1), /* capacities */ weight , weight );
+
+			row.push_back(weight);
 		}
+
+		leftRightWeights.push_back(row);
 	}
 
 	// Top-bottom weights
 	for (int i = 0 ; i < rows-1 ; i++) {
+
+			std::vector<float> row;
+
 		for (int j = 0 ; j < cols ; j++) {
-			
+
 			float weight = 0.0;
 			struct Color color1, color2;
 			struct ColorLab color1Lab, color2Lab;
@@ -91,11 +106,86 @@ void assignSmoothnessTerm(GraphType *g, IplImage *image, int rows, int cols) {
 			weight = LAMBDA * exp(-1.0 * dist * dist / (2.0 * (float)SIGMA * (float)SIGMA));
 
 			g -> add_edge( i*cols+j, (i+1)*cols+j, /* capacities */ weight , weight );
+
+			row.push_back(weight);
+		}
+
+		topBottomWeights.push_back(row);
+	}
+
+	// Normalize weights to show them as an image
+	float maxLeftRight = leftRightWeights.at(0).at(0);
+	float minLeftRight = leftRightWeights.at(0).at(0);
+	float maxTopBottom = leftRightWeights.at(0).at(0);
+	float minTopBottom = leftRightWeights.at(0).at(0);
+
+	for (unsigned int i = 0 ; i < leftRightWeights.size() ; i++) {
+		for (unsigned int j = 0 ; j < leftRightWeights.at(i).size() ; j++) {
+			if (leftRightWeights.at(i).at(j) > maxLeftRight)
+				maxLeftRight = leftRightWeights.at(i).at(j);
+			if (leftRightWeights.at(i).at(j) < minLeftRight)
+				minLeftRight = leftRightWeights.at(i).at(j);
+			
 		}
 	}
+
+	for (unsigned int i = 0 ; i < topBottomWeights.size() ; i++) {
+		for (unsigned int j = 0 ; j < topBottomWeights.at(i).size() ; j++) {
+			if (topBottomWeights.at(i).at(j) > maxTopBottom)
+				maxTopBottom = topBottomWeights.at(i).at(j);
+			if (topBottomWeights.at(i).at(j) < minTopBottom)
+				minTopBottom = topBottomWeights.at(i).at(j);
+			
+		}
+	}
+
+	for (unsigned int i = 0 ; i < leftRightWeights.size() ; i++) {
+		for (unsigned int j = 0 ; j < leftRightWeights.at(i).size() ; j++) {
+			leftRightWeights.at(i).at(j) = (leftRightWeights.at(i).at(j) - minLeftRight) / (maxLeftRight - minLeftRight);
+		}
+	}
+
+	for (unsigned int i = 0 ; i < topBottomWeights.size() ; i++) {
+		for (unsigned int j = 0 ; j < topBottomWeights.at(i).size() ; j++) {
+			topBottomWeights.at(i).at(j) = (topBottomWeights.at(i).at(j) - minLeftRight) / (maxLeftRight - minLeftRight);
+		}
+	}
+
+	// Create images to show weights
+	cv::Mat tmpLR = cv::Mat::zeros(leftRightWeights.size(), leftRightWeights.at(0).size(), CV_8UC3);
+	cv::Mat tmpTB = cv::Mat::zeros(topBottomWeights.size(), topBottomWeights.at(0).size(), CV_8UC3);
+	
+	for (int i = 0 ; i < tmpLR.rows ; i++) {
+		for (int j = 0 ; j < tmpLR.cols ; j++) {
+			int color = 255 * leftRightWeights.at(i).at(j);
+
+			tmpLR.data[tmpLR.step[0]*i + tmpLR.step[1]*j + 0] = color;
+			tmpLR.data[tmpLR.step[0]*i + tmpLR.step[1]*j + 1] = color;
+			tmpLR.data[tmpLR.step[0]*i + tmpLR.step[1]*j + 2] = color;
+		}
+	}
+
+	for (int i = 0 ; i < tmpTB.rows ; i++) {
+		for (int j = 0 ; j < tmpTB.cols ; j++) {
+			int color = 255 * topBottomWeights.at(i).at(j);
+
+			tmpTB.data[tmpTB.step[0]*i + tmpTB.step[1]*j + 0] = color;
+			tmpTB.data[tmpTB.step[0]*i + tmpTB.step[1]*j + 1] = color;
+			tmpTB.data[tmpTB.step[0]*i + tmpTB.step[1]*j + 2] = color;
+		}
+	}
+
+	cvReleaseImage(leftRightImage);
+	cvReleaseImage(topBottomImage);
+	*leftRightImage = cvCreateImage(cvSize(tmpLR.cols,tmpLR.rows),8,3);
+	*topBottomImage = cvCreateImage(cvSize(tmpTB.cols,tmpTB.rows),8,3);
+	IplImage ipltemp = tmpLR;
+	cvCopy(&ipltemp,*leftRightImage);
+	ipltemp = tmpTB;
+	cvCopy(&ipltemp,*topBottomImage);
 }
 
-struct Foreground extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols) {
+struct Foreground extractForeground(IplImage *input, IplImage **result, IplImage **leftRightImage, IplImage **topBottomImage, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols) {
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
 	cv::Mat inputMat(input, true);
 
@@ -106,7 +196,7 @@ struct Foreground extractForeground(IplImage *input, IplImage **result, struct G
 
 	// Assign weights
 	assignDataTerm(g, GMMForeground, GMMBackground, bb, rows, cols);
-	assignSmoothnessTerm(g, input, rows, cols);
+	assignSmoothnessTerm(leftRightImage, topBottomImage, g, input, rows, cols);
 
 	// Perform graph cut
 	g -> maxflow();

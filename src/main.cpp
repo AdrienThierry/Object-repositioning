@@ -34,6 +34,7 @@ int main( int argc, char** argv )
 	enum State { WaitForGround, WaitForBB, Compute, ShowResult };
 	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
 					GMMWeightedProbsBackground, GMMWeightedProbsForeground, 
+					SmoothnessLeftRight, SmoothnessTopBottom,
 					ExtractedForeground };
 	WhatToShow currentlyShown = BaseImage;
 	State currentState = WaitForGround;
@@ -56,7 +57,7 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/mouton.jpg"); // Input image
+	cv::Mat img = cv::imread("data/beach.jpg"); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -114,6 +115,8 @@ int main( int argc, char** argv )
 	IplImage *foregroundMat = NULL;
 	IplImage *foregroundMatScaled = NULL;
 	IplImage *foregroundWithDepthMat = NULL;
+	IplImage *smoothnessLeftRightMat = NULL;
+	IplImage *smoothnessTopBottomMat = NULL;
 
 	SDL_Surface *surf = NULL; // Whole image
 	SDL_Surface *foregroundSurf = NULL; // Movable foreground
@@ -188,6 +191,12 @@ int main( int argc, char** argv )
 							currentlyShown = GMMWeightedProbsForeground;
 							break;
 						case SDLK_KP_6:
+							currentlyShown = SmoothnessLeftRight;
+							break;
+						case SDLK_KP_7:
+							currentlyShown = SmoothnessTopBottom;
+							break;
+						case SDLK_KP_8:
 							currentlyShown = ExtractedForeground;
 							break;
 						default:
@@ -373,6 +382,16 @@ int main( int argc, char** argv )
 						convertCV_MatToSDL_Surface(&surf, GMMWeightedProbsForegroundMat);
 					}
 					break;
+				case SmoothnessLeftRight:
+					if (smoothnessLeftRightMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, smoothnessLeftRightMat);
+					}
+					break;
+				case SmoothnessTopBottom:
+					if (smoothnessTopBottomMat != NULL) {
+						convertCV_MatToSDL_Surface(&surf, smoothnessTopBottomMat);
+					}
+					break;
 				case ExtractedForeground:
 					if (extractedForegroundMat != NULL) {
 						convertCV_MatToSDL_Surface(&surf, extractedForegroundMat);
@@ -465,7 +484,9 @@ int main( int argc, char** argv )
 			// Graph cut to extract foreground
 			foregroundStruct = extractForeground(
 					img2, 
-					&extractedForegroundMat, 
+					&extractedForegroundMat,
+					&smoothnessLeftRightMat,
+					&smoothnessTopBottomMat,
 					GMMForeground,
 					GMMBackground,
 					boundingBox,
@@ -474,7 +495,7 @@ int main( int argc, char** argv )
 
 			// Compute movable foreground image
 			computeForegroundBB(&foregroundStruct);
-			computeForegroundImage(img2, &foregroundMat, &foregroundStruct);	
+			computeForegroundImage(img2, &foregroundMat, &foregroundStruct);
 
 			// Initial foreground position
 			foregroundPosition.x = foregroundStruct.bb.ends[0];

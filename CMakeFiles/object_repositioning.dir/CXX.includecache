@@ -147,6 +147,8 @@ opencv2/ml/ml.hpp
 -
 limits
 -
+math.h
+-
 BoundingBox.hpp
 /home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/src/BoundingBox.hpp
 Point.hpp

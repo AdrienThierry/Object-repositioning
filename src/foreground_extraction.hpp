@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <limits>
+#include <math.h>
 
 #include "BoundingBox.hpp"
 #include "Point.hpp"
@@ -11,7 +12,9 @@
 #include "graph.h"
 #include "GMM.hpp"
 
-#define SIGMA 10.0 // Sigma for smoothness term
+
+#define MAX_DATA_TERM 1000.0
+#define SIGMA 50.0 // Sigma for smoothness term
 #define LAMBDA 1.0 // Relative importance of the smoothness term
 
 #define dbg_print1(buffer, string, arg) write(1, buffer, sprintf(buffer, string, arg))
@@ -26,8 +29,8 @@ struct Foreground {
 GraphType* createGraph(int rows, int cols);
 
 void assignDataTerm(GraphType *g, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols);
-void assignSmoothnessTerm(GraphType *g, IplImage *image, int rows, int cols);
-struct Foreground extractForeground(IplImage *input, IplImage **result, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols);
+void assignSmoothnessTerm(IplImage** leftRightImage, IplImage** topBottomImage, GraphType *g, IplImage *image, int rows, int cols);
+struct Foreground extractForeground(IplImage *input, IplImage **result, IplImage **leftRightImage, IplImage **topBottomImage, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols);
 
 void computeForegroundBB(struct Foreground *foreground);
 void computeForegroundImage(IplImage *input, IplImage **result, struct Foreground *foreground);
