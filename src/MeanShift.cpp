@@ -1,3 +1,5 @@
+// Kanglai Qian (https://github.com/qiankanglai/opencv.meanshift)
+
 #include "MeanShift.h"
 
 RAList::RAList( void )

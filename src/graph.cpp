@@ -1,3 +1,6 @@
+// Copyright 2001-2006 Vladimir Kolmogorov (v.kolmogorov@cs.ucl.ac.uk), Yuri Boykov (yuri@csd.uwo.ca).
+// See README.txt
+
 /* graph.cpp */
 
 
