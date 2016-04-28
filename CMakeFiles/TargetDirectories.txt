@@ -1,3 +1,0 @@
-/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/CMakeFiles/rebuild_cache.dir
-/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/CMakeFiles/edit_cache.dir
-/home/adrien/Documents/Polytechnique Montréal/Cours/Hiver 2016/INF8801/Projet/object_repositioning/CMakeFiles/object_repositioning.dir
