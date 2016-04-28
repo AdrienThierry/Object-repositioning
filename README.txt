@@ -2,11 +2,15 @@
 I. DEPENDANCES
 ##################################################
 
-- OpenCV
+- OpenCV 
+J'ai utilisé la version 2.4.12.3-1. Le projet risque de
+ne pas marcher directement sur la version 3 (il y a l'air
+d'avoir eu pas mal de changements entre les versions 2 et 3).
+
 - SDL2
 
 ##################################################
-II. COMPILATION
+II. COMPILATION (si l'exécutable ne fonctionne pas)
 ##################################################
 
 cmake .
