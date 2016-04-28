@@ -6,7 +6,7 @@ I. DEPENDANCES
 - SDL2
 
 ##################################################
-II. COMPILATION (si l'exécutable ne marche pas)
+II. COMPILATION
 ##################################################
 
 cmake .
@@ -16,9 +16,15 @@ make
 III. UTILISATION
 ##################################################
 
-Syntaxe : ./object_repositioning chemin_image_a_charger
+Des images de test sont disponibles dans le dossier "images"
 
-0) Attendre quelques secondes que l'image s'affiche (le meanshift se fait au lancement du programme)
+-------------------------------------------------------
+Syntaxe : ./object_repositioning chemin_image_a_charger
+Par exemple : ./object_repositioning images/beach.jpg
+-------------------------------------------------------
+
+0) Attendre quelques secondes que l'image s'affiche (la génération
+des superpixels avec meanshift est faite au lancement du programme)
 
 1) Cliquer à l'endroit où vous souhaitez placer la ligne qui marque la profondeur
 maximale de la scène
@@ -27,7 +33,7 @@ maximale de la scène
 
 3) Attendre (~1 min). Quand les calculs sont finis, seul l'objet extrait est affiché.
 
-4) Les touches du pavé numérique permettent d'accéder au différents modes de visualisation :
+4) Les touches du pavé numérique permettent d'accéder aux différents modes de visualisation :
 	0 -	Mode interactif. Vous pouvez faire un drag&drop sur l'objet choisi pour en déplacer
 		une copie dans la scène.
 	1 -	Résultat du MeanShift
