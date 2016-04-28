@@ -26,9 +26,6 @@ void assignDataTerm(GraphType *g, struct GMM* GMMForeground, struct GMM* GMMBack
 				// It's normal that background and foreground are inverted (see https://www.youtube.com/watch?v=lYQQ88nzxAM)
 				foregroundWeight = std::max(GMMBackground->weightedLL.at(i).at(j), MAX_DATA_TERM);
 				backgroundWeight = std::max(GMMForeground->weightedLL.at(i).at(j), MAX_DATA_TERM);
-
-				//foregroundWeight = GMMBackground->weightedLL.at(i).at(j);
-				//backgroundWeight = GMMForeground->weightedLL.at(i).at(j);
 			}
 			// Outside bounding box => positively background
 			else {
@@ -41,7 +38,7 @@ void assignDataTerm(GraphType *g, struct GMM* GMMForeground, struct GMM* GMMBack
 }
 
 void assignSmoothnessTerm(IplImage** leftRightImage, IplImage** topBottomImage, GraphType *g, IplImage *image, int rows, int cols) {
-	cv::Mat imageMat(image, true);
+	cv::Mat imageMat(image);
 	
 	std::vector<std::vector<float> > leftRightWeights;
 	std::vector<std::vector<float> > topBottomWeights;
@@ -187,7 +184,7 @@ void assignSmoothnessTerm(IplImage** leftRightImage, IplImage** topBottomImage, 
 
 struct Foreground extractForeground(IplImage *input, IplImage **result, IplImage **leftRightImage, IplImage **topBottomImage, struct GMM* GMMForeground, struct GMM* GMMBackground, struct BoundingBox bb, int rows, int cols) {
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
-	cv::Mat inputMat(input, true);
+	cv::Mat inputMat(input);
 
 	struct Foreground foregroundResult;
 
@@ -285,7 +282,7 @@ void computeForegroundImage(IplImage *input, IplImage **result, struct Foregroun
 	int cols = xMax - xMin;
 
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC4);
-	cv::Mat inputMat(input, true);
+	cv::Mat inputMat(input);
 
 	for (int i = yMin ; i < yMax ; i++) {
 		for (int j = xMin ; j < xMax ; j++) {
@@ -316,55 +313,10 @@ void computeForegroundImage(IplImage *input, IplImage **result, struct Foregroun
 
 }
 
-void convertForegroundMaskToCV_Mat(IplImage** result, struct Foreground *foreground, int rows, int cols) {
-	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
-	
-	// Create OpenCV matrix
-	for (int i = 0 ; i < tmpResult.rows ; i++) {
-		for (int j = 0 ; j < tmpResult.cols ; j++) {
-			int color = 255 * (int)foreground->mask.at(i).at(j);
-
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = color;
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = color;
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = color;
-			
-		}
-	}
-
-	// Draw bounding box
-	int xMin = foreground->bb.ends[0];
-	int xMax = foreground->bb.ends[1];
-	int yMin = foreground->bb.ends[2];
-	int yMax = foreground->bb.ends[3];
-	for (int i = yMin ; i < yMax ; i++) {
-		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMin + 0] = 0;
-		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMin + 1] = 255;
-		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMin + 2] = 0;
-
-		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMax + 0] = 0;
-		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMax + 1] = 255;
-		tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*xMax + 2] = 0;
-	}
-	for (int i = xMin ; i < xMax ; i++) {
-		tmpResult.data[tmpResult.step[0]*yMin + tmpResult.step[1]*i + 0] = 0;
-		tmpResult.data[tmpResult.step[0]*yMin + tmpResult.step[1]*i + 1] = 255;
-		tmpResult.data[tmpResult.step[0]*yMin + tmpResult.step[1]*i + 2] = 0;
-
-		tmpResult.data[tmpResult.step[0]*yMax + tmpResult.step[1]*i + 0] = 0;
-		tmpResult.data[tmpResult.step[0]*yMax + tmpResult.step[1]*i + 1] = 255;
-		tmpResult.data[tmpResult.step[0]*yMax + tmpResult.step[1]*i + 2] = 0;
-	}
-
-	cvReleaseImage(result);
-	*result = cvCreateImage(cvSize(cols,rows),8,3);
-	IplImage ipltemp = tmpResult;
-	cvCopy(&ipltemp,*result);
-}
-
 void updateExtractedForegroundMat(IplImage** result, IplImage *foregroundMat, SDL_Rect *foregroundPosition, int rows, int cols) {
 	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC4);
 
-	cv::Mat foreground(foregroundMat, true);
+	cv::Mat foreground(foregroundMat);
 
 	// Create OpenCV matrix
 	for (int i = 0 ; i < tmpResult.rows ; i++) {

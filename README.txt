@@ -1,13 +1,54 @@
 ##################################################
-I. COMPILATION
+I. DEPENDANCES
 ##################################################
 
-##################################################
-II. UTILISATION
-##################################################
+- OpenCV
+- SDL2
 
 ##################################################
-III. LICENCES
+II. COMPILATION (si l'exécutable ne marche pas)
+##################################################
+
+cmake .
+make
+
+##################################################
+III. UTILISATION
+##################################################
+
+Syntaxe : ./object_repositioning chemin_image_a_charger
+
+0) Attendre quelques secondes que l'image s'affiche (le meanshift se fait au lancement du programme)
+
+1) Cliquer à l'endroit où vous souhaitez placer la ligne qui marque la profondeur
+maximale de la scène
+
+2) Dessiner une boîte englobante autour de l'objet à segmenter
+
+3) Attendre (~1 min). Quand les calculs sont finis, seul l'objet extrait est affiché.
+
+4) Les touches du pavé numérique permettent d'accéder au différents modes de visualisation :
+	0 -	Mode interactif. Vous pouvez faire un drag&drop sur l'objet choisi pour en déplacer
+		une copie dans la scène.
+	1 -	Résultat du MeanShift
+	2 -	Classification des superpixels selon leur intersection avec la boîte englobante.
+		* En blanc : superpixels à l'extérieur de la boîte englobante
+		* En noir : superpixels qui intersectent la boîte englobante
+		* En gris : superpixels à l'intérieur de la boîte englobante
+	3 -	Carte de salience
+	4 - Probabilité d'appartenance à l'arrière plan
+		(intensité du pixel proportionnelle à la probabilité)
+	5 - Probabilité d'appartenance à l'avant plan
+		(intensité du pixel proportionnelle à la probabilité)
+	6 -	Terme de "smoothness" pour le graph cut (poids entre un pixel et son
+		voisin du bas)
+	7 -	Terme de "smoothness" pour le graph cut (poids entre un pixel et son
+		voisin de droite)
+	8 - Résultat de la segmentation
+
+
+##################################################
+IV. LICENCES
 ##################################################
 
 Code du Graphcut

@@ -31,6 +31,8 @@ typedef struct PolygonalChain PolygonalChain;
 
 int main( int argc, char** argv )
 {
+	string imagePath = "";
+
 	enum State { WaitForGround, WaitForBB, Compute, ShowResult };
 	enum WhatToShow { BaseImage, Superpixels, SuperpixelsIntersection, Saliency, 
 					GMMWeightedProbsBackground, GMMWeightedProbsForeground, 
@@ -55,9 +57,24 @@ int main( int argc, char** argv )
 	sem_init(&semGMMBackground, 0, 0);
 
 	//--------------------------------------------------------------------------------
+	// Check arguments
+	//--------------------------------------------------------------------------------
+	if (argc > 2) {
+		printf("ERROR : too many arguments");
+		exit(EXIT_FAILURE);
+	}
+	else if (argc < 2) {
+		printf("ERROR : too few arguments. Please enter the name of the image to load.");
+		exit(EXIT_FAILURE);
+	}
+	else {
+		imagePath = argv[1];
+	}
+
+	//--------------------------------------------------------------------------------
 	// Image loading
 	//--------------------------------------------------------------------------------
-	cv::Mat img = cv::imread("data/beach.jpg"); // Input image
+	cv::Mat img = cv::imread(imagePath); // Input image
 
 	// IplImage generation from img. Ipgimage is used as input for Meanshift segmentation
 	IplImage* img2;
@@ -104,22 +121,22 @@ int main( int argc, char** argv )
 	//--------------------------------------------------------------------------------
 	// Matrix declarations
 	//--------------------------------------------------------------------------------	
-	IplImage *superpixelsMat = NULL;
+	IplImage *superpixelsMat = NULL; // Superpixels
 	convertSuperpixelsToCV_Mat(&superpixelsMat, superpixels, img.rows, img.cols);
 
-	IplImage *superpixelsIntersectionMat = NULL;
-	IplImage *saliencyMat = NULL;
-	IplImage *GMMWeightedProbsBackgroundMat = NULL;
-	IplImage *GMMWeightedProbsForegroundMat = NULL;
-	IplImage *extractedForegroundMat = NULL;
-	IplImage *foregroundMat = NULL;
-	IplImage *foregroundMatScaled = NULL;
-	IplImage *foregroundWithDepthMat = NULL;
-	IplImage *smoothnessLeftRightMat = NULL;
-	IplImage *smoothnessTopBottomMat = NULL;
+	IplImage *superpixelsIntersectionMat = NULL; // Superpixels
+	IplImage *saliencyMat = NULL; // Saliency map
+	IplImage *GMMWeightedProbsBackgroundMat = NULL; // Background probs
+	IplImage *GMMWeightedProbsForegroundMat = NULL; // Foreground probs
+	IplImage *extractedForegroundMat = NULL; // Mat with only foreground but same size as original image
+	IplImage *foregroundMat = NULL; // Mat with only foreground (size is foreground size)
+	IplImage *foregroundMatScaled = NULL; // Mat with only scaled foreground (size is scaled foreground size)
+	IplImage *foregroundWithDepthMat = NULL; // Final image
+	IplImage *smoothnessLeftRightMat = NULL; // Left-right smoothness term
+	IplImage *smoothnessTopBottomMat = NULL; // Top-bottom smoothness term
 
-	SDL_Surface *surf = NULL; // Whole image
-	SDL_Surface *foregroundSurf = NULL; // Movable foreground
+	SDL_Surface *surf = NULL; // Original image
+	SDL_Surface *foregroundSurf = NULL; // Image with moved foreground
 	SDL_Texture *tex = NULL;
 	SDL_Texture *foregroundTex = NULL;
 
@@ -171,12 +188,15 @@ int main( int argc, char** argv )
 			//--------------------------------------------------------------------------------
 			if (e.type == SDL_KEYDOWN) {
 				if (currentState == ShowResult) {
+					drawCentroids = false;
+
 					switch(e.key.keysym.sym) {
 						case SDLK_KP_0:
 							currentlyShown = BaseImage;
 							break;
 						case SDLK_KP_1:
 							currentlyShown = Superpixels;
+							drawCentroids = true;
 							break;
 						case SDLK_KP_2:
 							currentlyShown = SuperpixelsIntersection;

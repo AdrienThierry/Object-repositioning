@@ -117,6 +117,8 @@ float distanceSuperpixels(struct Superpixel *superpixel1, struct Superpixel *sup
 
 float distanceLab(struct ColorLab color1, struct ColorLab color2) {
 	float distance = 0;
+	// All Lab components are divided by 255 because OpenCV encodes them between 0 and 255,
+	// even if it's not the case in the Lab standard
 	float diffL = ((float)color2.L - (float)color1.L) / 255.0;
 	float diffa = ((float)color2.a - (float)color1.a) / 255.0;
 	float diffb = ((float)color2.b - (float)color1.b) / 255.0;

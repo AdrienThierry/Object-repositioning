@@ -36,6 +36,7 @@ void convertSaliencyToCV_Mat(IplImage **result, std::vector<struct Superpixel>* 
 // Show centroids of superpixels with an SDL_Renderer
 void showCentroids(SDL_Renderer *ren, std::vector<struct Superpixel>* superpixels);
 
+// Compute look-up table for quicker access to saliency values
 std::vector<float> getSaliencyBackgroundLUT(std::vector<struct Superpixel>* superpixels, int rows, int cols);
 std::vector<float> getSaliencyForegroundLUT(std::vector<struct Superpixel>* superpixels, struct BoundingBox bb);
 

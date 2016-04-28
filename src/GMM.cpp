@@ -17,7 +17,6 @@ void *computeGMM(void *args) {
 	image.reshape(1,image.rows*image.cols).convertTo(samples,CV_64FC1,1.0/255.0);
 	model.train(samples, logLikelihood, labels, probs);
 
-	//probs = probs.reshape(NB_GMM_CLUSTERS, image.rows);
 	labels = labels.reshape(1, image.rows);
 
 	// Get GMM weights
@@ -131,63 +130,6 @@ void postProcessingForegroundGMM(struct GMM *GMM, BoundingBox bb, int rows, int 
 	GMM->weightedProbs = newProbs;
 	GMM->labels = newLabels;
 	GMM->weightedLL = newWeightedLL;
-}
-
-
-void convertGMMLabelsToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols) {
-	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
-
-	// Create OpenCV matrix
-	for (int i = 0 ; i < tmpResult.rows ; i++) {
-		for (int j = 0 ; j < tmpResult.cols ; j++) {
-			int color = (int)(255.0 / (double)NB_GMM_CLUSTERS * GMM->labels.at(i).at(j));
-
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = color;
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = color;
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = color;
-			
-		}
-	}
-
-	cvReleaseImage(result);
-	*result = cvCreateImage(cvSize(cols,rows),8,3);
-	IplImage ipltemp = tmpResult;
-	cvCopy(&ipltemp,*result);
-}
-
-void convertGMMWeightedLLToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols) {
-	cv::Mat tmpResult = cv::Mat::zeros(rows, cols, CV_8UC3);
-
-	// Find minimum and maximum of weightedLL for normalization
-	double minWeightedLL = GMM->weightedLL.at(0).at(0);
-	double maxWeightedLL = GMM->weightedLL.at(0).at(0);
-	for (unsigned int i = 0 ; i < GMM->weightedLL.size() ; i++) {
-		for (unsigned int j = 0 ; j < GMM->weightedLL.at(0).size() ; j++) {
-			if (GMM->weightedLL.at(i).at(j) >= maxWeightedLL) {
-				maxWeightedLL = GMM->weightedLL.at(i).at(j);
-			}
-
-			if (GMM->weightedLL.at(i).at(j) <= minWeightedLL) {
-				minWeightedLL = GMM->weightedLL.at(i).at(j);
-			}
-		}
-	}	
-
-	// Create OpenCV matrix
-	for (int i = 0 ; i < tmpResult.rows ; i++) {
-		for (int j = 0 ; j < tmpResult.cols ; j++) {
-			int color = (int)((GMM->weightedLL.at(i).at(j) - minWeightedLL) * 255.0 / maxWeightedLL);
-
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 0] = color;
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 1] = color;
-			tmpResult.data[tmpResult.step[0]*i + tmpResult.step[1]*j + 2] = color;
-		}
-	}
-
-	cvReleaseImage(result);
-	*result = cvCreateImage(cvSize(cols,rows),8,3);
-	IplImage ipltemp = tmpResult;
-	cvCopy(&ipltemp,*result);
 }
 
 void convertGMMWeightedProbsToCV_Mat(IplImage** result, struct GMM *GMM, int rows, int cols) {

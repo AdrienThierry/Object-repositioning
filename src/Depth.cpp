@@ -13,7 +13,7 @@ std::vector<std::vector<float> > computeDepthMap(struct PolygonalChain *groundLi
 		std::vector<float> row;
 
 		for (int j = 0 ; j < cols ; j++) {
-			// If pixel is foreground
+			// If pixel is foreground (alpha != 0 in foregroundMat)
 			if (foregroundMat.data[foregroundMat.step[0]*i + foregroundMat.step[1]*j + 3] != 0) {
 				row.push_back(((float)yBottom - (float)yGround)/(float)yGround);
 			}
