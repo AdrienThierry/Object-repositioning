@@ -47,9 +47,9 @@ maximale de la scène
 	5 - Probabilité d'appartenance à l'avant plan
 		(intensité du pixel proportionnelle à la probabilité)
 	6 -	Terme de "smoothness" pour le graph cut (poids entre un pixel et son
-		voisin du bas)
-	7 -	Terme de "smoothness" pour le graph cut (poids entre un pixel et son
 		voisin de droite)
+	7 -	Terme de "smoothness" pour le graph cut (poids entre un pixel et son
+		voisin du bas)
 	8 - Résultat de la segmentation
 
 
