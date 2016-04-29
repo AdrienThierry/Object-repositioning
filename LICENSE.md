@@ -30,7 +30,6 @@ From above link : "You can use the code in the way whatever you like, but I will
 **Concerned files :** all remaining files that are not affected by one of the previous licences
 
 My code is available under the MIT licence
-MIT License
 
 Copyright (c) 2016 Adrien THIERRY
 
