@@ -23,6 +23,7 @@ This software can be used for research purposes only.
 - MeanShift.h
 
 Kanglai Qian (https://github.com/qiankanglai/opencv.meanshift)
+
 From above link : You can use the code in the way whatever you like, but I will be very pleased if you can send me back your comments or include this github project in your work(Maybe in the code comments, aha~).
 
 ##My code
