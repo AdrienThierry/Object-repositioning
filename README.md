@@ -6,8 +6,7 @@ Basically, this program implements part of the method described in the article *
 ## Dependencies
 * cmake 
 * SDL2
-* OpenCV 
-The project uses version 2.4.12.3-1. It may not work with OpenCV 3.
+* OpenCV (The project uses version 2.4.12.3-1. It may not work with OpenCV 3)
 
 ## Compilation
 ```
@@ -27,6 +26,7 @@ For example :
 ```
 ./object_repositioning images/beach.jpg
 ```
+
 1. **Wait** for a few seconds until the image is shown (superpixels computation is done at launch)
 
 2. Click where you want to place the **ground line** (max depth in the scene)
@@ -35,13 +35,14 @@ For example :
 
 4. **Wait** (~1min depending on your processing power). When computation is finished, only the segmented object is shown.
 
-5. Use the **keypad** to go through all the visualization mode
-  0 - Interactive mode. You can **drag&drop** a copy of the object you chose in the scene. The size of the object updates according to where you place it. 
+5. Use the **keypad** to go through all the visualization modes
+
+  0 - Interactive mode. You can **drag&drop** a copy of the object you chose in the scene. The size of the object changed in real-time according to where you place it
   
   1 - Superpixels
   
   2 -	Intersection between superpixels and bounding box 
-    * **White** : superpixels *outside* bounding box
+    * **White** : superpixels *outside* the bounding box
     * **Black** : superpixels which *intersect* the bounding box
     * **Grey** : superpixels *inside* the bounding box
     
