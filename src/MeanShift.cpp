@@ -61,7 +61,7 @@ int MeanShift(const IplImage* img, int **labels)
 
 	// Step One. Filtering stage of meanshift segmentation
 	// http://rsbweb.nih.gov/ij/plugins/download/Mean_Shift.java
-	for(int i=0;i<img->height;i++) 
+	for(int i=0;i<img->height;i++) {
 		for(int j=0;j<img->width;j++)
 		{
 			int ic = i;
@@ -138,6 +138,7 @@ int MeanShift(const IplImage* img, int **labels)
 			((uchar *)(result->imageData + i*img->widthStep))[j*result->nChannels + 1] = (uchar)U;
 			((uchar *)(result->imageData + i*img->widthStep))[j*result->nChannels + 2] = (uchar)V;
 		}
+	}
 
 		IplImage *tobeshow = cvCreateImage(cvGetSize(img),img->depth,img->nChannels);
 		cvCvtColor(result, tobeshow, CV_Lab2RGB);
@@ -156,7 +157,7 @@ int MeanShift(const IplImage* img, int **labels)
 				for(int j=0;j<img->width;j++)
 					labels[i][j] = -1;
 			for(int i=0;i<img->height;i++) 
-				for(int j=0;j<img->width;j++)
+				for(int j=0;j<img->width;j++) {
 					if(labels[i][j]<0)
 					{
 						labels[i][j] = ++label;
@@ -195,6 +196,7 @@ int MeanShift(const IplImage* img, int **labels)
 						mode[label*3+1] /= modePointCounts[label];
 						mode[label*3+2] /= modePointCounts[label];
 					}
+				}
 					//current Region count
 					regionCount = label+1;
 		}			
@@ -217,7 +219,7 @@ int MeanShift(const IplImage* img, int **labels)
 			}
 			raPool[10*regionCount-1].next = NULL;
 			RAList	*raNode1, *raNode2, *oldRAFreeList, *freeRAList = raPool;
-			for(int i=0;i<img->height;i++) 
+			for(int i=0;i<img->height;i++) {
 				for(int j=0;j<img->width;j++)
 				{
 					if(i>0 && labels[i][j]!=labels[i-1][j])
@@ -251,6 +253,7 @@ int MeanShift(const IplImage* img, int **labels)
 							raList[labels[i][j-1]].Insert(raNode1);
 					}
 				}
+			}
 
 				// 2.Treat each region Ri as a disjoint set
 				for(int i = 0; i < regionCount; i++)
@@ -355,7 +358,7 @@ int MeanShift(const IplImage* img, int **labels)
 				}
 				raPool[10*regionCount-1].next = NULL;
 				RAList	*raNode1, *raNode2, *oldRAFreeList, *freeRAList = raPool;
-				for(int i=0;i<img->height;i++) 
+				for(int i=0;i<img->height;i++) {
 					for(int j=0;j<img->width;j++)
 					{
 						if(i>0 && labels[i][j]!=labels[i-1][j])
@@ -389,8 +392,9 @@ int MeanShift(const IplImage* img, int **labels)
 								raList[labels[i][j-1]].Insert(raNode1);
 						}
 					}
+				}
 					// Find small regions
-					for(int i = 0; i < regionCount; i++)
+					for(int i = 0; i < regionCount; i++) {
 						if(modePointCounts[i] < minRegion)
 						{
 							minRegionCount++;
@@ -419,6 +423,7 @@ int MeanShift(const IplImage* img, int **labels)
 								raList[iCanEl].label = neighCanEl;
 							}
 						}
+					}
 						for(int i = 0; i < regionCount; i++)
 						{
 							int iCanEl	= i;

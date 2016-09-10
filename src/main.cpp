@@ -152,9 +152,9 @@ int main( int argc, char** argv )
 	groundLine.y = 0;
 
 	SDL_Rect foregroundPosition;
-	float ratio; // Foreground aspect ratio
-	int originalHeight;
-	int originalBottom;
+	float ratio = 0.0f; // Foreground aspect ratio
+	int originalHeight = 0;
+	int originalBottom = 0;
 	BoundingBox originalForegroundBB;
 
 	bool clicking = false;
@@ -177,6 +177,14 @@ int main( int argc, char** argv )
 	}
 	bool quit = false;
 	struct Point clickCoord, mousePosition, previousPosition, delta;
+	clickCoord.x = 0;
+	clickCoord.y = 0;
+	mousePosition.x = 0;
+	mousePosition.y = 0;
+	previousPosition.x = 0;
+	previousPosition.y = 0;
+	delta.x = 0;
+	delta.y = 0;
 	while (!quit){
 		while (SDL_PollEvent(&e)){
 			if (e.type == SDL_QUIT){

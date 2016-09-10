@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project( object_repositioning )
 
+set(CMAKE_BUILD_TYPE Release)
+
 add_definitions ("-Wall")
 add_definitions ("-Wno-write-strings")
 add_definitions ("-Wno-parentheses")
