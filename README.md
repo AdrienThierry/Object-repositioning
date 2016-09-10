@@ -3,6 +3,9 @@ Interface to move objects in an image in a user-friendly way.
 
 Basically, this program implements part of the method described in the article *Object Repositioning Based on the Perspective in a Single Image* by S.Iizuka, Y. Endo, M. Hirose, Y. Kanamori, J. Mitani, Y. Fukui. (http://www.npal.cs.tsukuba.ac.jp/~iizuka/projects/reposition/data/cgf_repos.pdf)
 
+|![alt tag](https://raw.githubusercontent.com/AdrienThierry/Object-repositioning/master/screenshots/beach_base.png)    |![alt tag](https://raw.githubusercontent.com/AdrienThierry/Object-repositioning/master/screenshots/beach_computing.png)    | ![alt tag](https://raw.githubusercontent.com/AdrienThierry/Object-repositioning/master/screenshots/beach_final.png)   |
+|---|---|---|
+
 ## Dependencies
 * cmake 
 * SDL2
